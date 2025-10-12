@@ -8,7 +8,6 @@ import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/auth/data/model/login_request_model.dart';
 
 abstract class AuthApiService {
-  // Tentukan tipe secara spesifik: String untuk error, Response untuk sukses
   Future<Either<String, Response>> login(LoginRequestModel loginRequestModel);
 }
 
