@@ -1,174 +1,206 @@
-// lib/main.dart
+// lib/features/auth/data/model/login_request_model.dart
 
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
-import 'package:gmedia_project/common/bloc/auth/auth_state.dart';
-import 'package:gmedia_project/core/services/services_locator.dart';
+import 'dart:convert';
 
-void main() {
-  setUpServiceLocator();
-  runApp(const MyApp());
+import 'package:gmedia_project/features/auth/domain/entities/login_request_entity.dart';
+
+class LoginRequestModel {
+  final String email;
+  final String password;
+
+  LoginRequestModel({required this.email, required this.password});
+
+  Map<String, dynamic> toMap() {
+    return {'email': email, 'password': password};
+  }
+
+  String toJson() => json.encode(toMap());
+
+  LoginRequestEntity toEntity() {
+    return LoginRequestEntity(email: email, password: password);
+  }
+
+  factory LoginRequestModel.fromMap(Map<String, dynamic> map) {
+    return LoginRequestModel(
+      email: map['email'] ?? '',
+      password: map['password'] ?? '',
+    );
+  }
+
+  factory LoginRequestModel.fromJson(String source) =>
+      LoginRequestModel.fromMap(json.decode(source));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthStateCubit()..appStarted(),
-      child: MaterialApp(
-        title: 'MASPOS',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          scaffoldBackgroundColor: Colors.white,
-        ),
-        home: BlocBuilder<AuthStateCubit, AuthState>(
-          builder: ( context, state) {
-            if (state is Authenticated) {
-              return const Scaffold(
-                body: Center(
-                  child: Text('Authenticated'),
-                ),
-              );
-            } else if (state is UnAuthenticated) {
-              return const Scaffold(
-                body: Center(
-                  child: Text('UnAuthenticated'),
-                ),
-              );
-            } else {
-              return const Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );            }
-          },
+// lib/features/auth/data/repository_impl/auth_repository_impl.dart
 
-        ),
-      ),
+import 'package:dartz/dartz.dart';
+import 'package:gmedia_project/core/services/services_locator.dart';
+import 'package:gmedia_project/features/auth/data/model/login_request_model.dart';
+import 'package:gmedia_project/features/auth/data/source/auth_api_service.dart';
+import 'package:gmedia_project/features/auth/data/source/auth_local_service.dart';
+import 'package:gmedia_project/features/auth/domain/repository/auth_repository.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class AuthRepositoryImpl extends AuthRepository {
+  @override
+  Future<bool> isLoggedIn() async {
+    return await sl<AuthLocalService>().isLoggedIn();
+  }
+
+  @override
+  Future<Either> signIn(LoginRequestModel loginRequestModel) async {
+    Either result = await sl<AuthApiService>().login(loginRequestModel);
+    return result.fold(
+      (error) {
+        return Left(error);
+      },
+      (data) async {
+        Response response = data;
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.setString(
+          "token",
+          response.data['data']['token'],
+        );
+        return Right(response);
+      },
     );
   }
 }
 
+// lib/features/auth/data/source/auth_api_service.dart
 
-
-// lib/pages/welcome_page.dart
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart'; // Sesuaikan path ini
-
-class WelcomePage extends StatelessWidget {
-  const WelcomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Selamat Datang di Aplikasi MASPOS!',
-              style: TextStyle(fontSize: 24),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Memberi tahu Cubit bahwa proses 'first run' telah selesai
-                context.read<AuthStateCubit>().setFirstRunComplete();
-              },
-              child: const Text('Mulai Sekarang'),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-//lib/features/welcome/domain/repository/welcome_repository.dart
-
-abstract class WelcomeRepository {
-  Future<bool> isFirstRun();
-}
-
-
-|// lib/common/bloc/auth/auth_state.dart
-
-abstract class AuthState {}
-
-class AppInitialState extends AuthState {}
-
-class Authenticated extends AuthState {}
-
-class UnAuthenticated extends AuthState {}
-
-class FirstRun extends AuthState {}
-
-
-    // lib/common/bloc/auth/auth_cubit.dart
-
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gmedia_project/common/bloc/auth/auth_state.dart';
-import 'package:gmedia_project/core/services/services_locator.dart';
-import 'package:gmedia_project/features/auth/domain/usecase/is_logged_in.dart';
-import 'package:gmedia_project/features/welcome/domain/usecase/is_first_run_usecase.dart';
-// Anggap Anda punya Usecase untuk MENYIMPAN status first run
-import 'package:gmedia_project/features/welcome/domain/usecase/set_first_run_complete_usecase.dart';
-
-class AuthStateCubit extends Cubit<AuthState> {
-  AuthStateCubit() : super(AppInitialState());
-
-  /// Fungsi privat untuk mengecek status login.
-  /// Ini adalah inti dari prinsip DRY, logikanya terpusat di sini.
-  Future<void> _checkAuthStatus() async {
-    // Memanggil usecase untuk mengecek apakah ada token/sesi aktif
-    final bool isLoggedIn = await sl<IsLoggedInUseCase>().call();
-    if (isLoggedIn) {
-      emit(Authenticated());
-    } else {
-      emit(UnAuthenticated());
-    }
-  }
-
-  /// Metode utama yang dipanggil saat aplikasi pertama kali berjalan.
-  void appStarted() async {
-    // 1. Pertama, cek apakah ini adalah 'first run' atau bukan.
-    final bool isFirstRun = await sl<IsFirstRunUsecase>().call();
-    
-    if (isFirstRun) {
-      // Jika ya, tampilkan halaman welcome
-      emit(FirstRun());
-    } else {
-      // 2. Jika bukan, lanjutkan ke pengecekan status login.
-      await _checkAuthStatus();
-    }
-  }
-
-  /// Metode ini dipanggil dari WelcomePage setelah pengguna menekannya.
-  void finishWelcomeScreen() async {
-    await sl<SetFirstRunCompleteUseCase>().call();
-    await _checkAuthStatus();
-  }
-}
-
-// lib/core/services/services_locator.dart
-
-import 'package:get_it/get_it.dart';
+import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
+import 'package:gmedia_project/core/constant/api_urls.dart';
 import 'package:gmedia_project/core/network/dio_client.dart';
-import 'package:gmedia_project/features/auth/domain/usecase/is_logged_in.dart';
-import 'package:gmedia_project/features/auth/domain/usecase/signin_usecases.dart';
+import 'package:gmedia_project/core/services/services_locator.dart';
+import 'package:gmedia_project/features/auth/data/model/login_request_model.dart';
 
-final sl = GetIt.instance;
+abstract class AuthApiService {
+  Future<Either> login(LoginRequestModel loginRequestModel);
+}
 
-void setUpServiceLocator(){
-  sl.registerSingleton<DioClient>(DioClient());
-  sl.registerSingleton<IsLoggedInUseCase>(IsLoggedInUseCase());
-  sl.registerSingleton<SigninUsecases>(SigninUsecases());
-  // sl.registerSingleton<AuthRepository>(AuthRepository());
+class AuthApiServiceImpl implements AuthApiService {
+  @override
+  Future<Either> login(LoginRequestModel loginRequestModel) async {
+    try {
+      var response = await sl<DioClient>().post(
+        ApiUrls.login,
+        data: loginRequestModel.toMap(),
+      );
+      return Right(response.data);
+    }on DioException catch (e) {
+      return Left(e.response!.data['message'] ?? 'Login failed');
+    }
+  }
 }
 
 
+// lib/features/auth/data/source/auth_local_service.dart
 
+import 'package:shared_preferences/shared_preferences.dart';
+
+abstract class AuthLocalService {
+  Future<void> saveToken(String token);
+  Future<bool> isLoggedIn();
+}
+
+
+class AuthLocalServiceImpl implements AuthLocalService{
+  final SharedPreferences sharedPreferences;
+  AuthLocalServiceImpl(this.sharedPreferences);
+  
+  @override
+  Future<bool> isLoggedIn() async {
+    final String? token = sharedPreferences.getString('token');
+    return token != null && token.isNotEmpty;
+  }
+  
+  @override
+  Future<void> saveToken(String token) async {
+    await sharedPreferences.setString('token', token);
+  }
+}
+
+// lib/features/auth/domain/entities/login_request_entity.dart
+
+class LoginRequestEntity {
+  final String email;
+  final String password;
+
+  LoginRequestEntity({required this.email, required this.password});
+}
+
+// lib/features/auth/domain/repository/auth_repository.dart
+
+import 'package:dartz/dartz.dart';
+import 'package:gmedia_project/features/auth/data/model/login_request_model.dart';
+
+abstract class AuthRepository {
+  Future<Either> signIn(LoginRequestModel loginRequestModel);
+  Future<bool> isLoggedIn();
+}
+
+
+// lib/features/auth/domain/usecase/is_logged_in.dart
+
+import 'package:gmedia_project/core/services/services_locator.dart';
+import 'package:gmedia_project/core/usecase/usecase.dart';
+import 'package:gmedia_project/features/auth/domain/repository/auth_repository.dart';
+
+class IsLoggedInUseCase implements Usecase<bool, dynamic> {
+  @override
+  Future<bool> call({dynamic param}) async {
+    return await sl<AuthRepository>().isLoggedIn();
+  }
+}
+
+
+// lib/features/auth/domain/usecase/signin_usecases.dart
+
+import 'package:dartz/dartz.dart';
+import 'package:gmedia_project/core/services/services_locator.dart';
+import 'package:gmedia_project/core/usecase/usecase.dart';
+import 'package:gmedia_project/features/auth/data/model/login_request_model.dart';
+import 'package:gmedia_project/features/auth/domain/repository/auth_repository.dart';
+
+class SigninUsecases implements Usecase<Either, LoginRequestModel> {
+  @override
+  Future<Either> call({LoginRequestModel? param}) async {
+    return sl<AuthRepository>().signIn(param!);
+  }
+
+}
+
+
+// lib/features/auth/presentation/cubit/button/button_cubit.dart
+
+// lib/features/auth/presentation/cubit/button/button_state.dart
+// lib/features/auth/presentation/cubit/visible/visible_cubit.dart
+// lib/features/auth/presentation/cubit/visible/visible_state.dart
+
+// lib/features/auth/presentation/pages/login_page.dart
+
+import 'package:flutter/material.dart';
+
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text('Login Page');
+  }
+}
+
+class ApiUrls {
+  //user
+  static const String baseUrl = "mas-pos.appmedia.id/api/v1";
+  static const String login = "$baseUrl/login";
+  static const String profile = "$baseUrl/profile";
+  static const String category = "$baseUrl/category"; //get post put(id) delete(id)
+  static const String product = "$baseUrl/product"; //get post delete(id)
+  static const String updateProduct = "$baseUrl/product/update";  //(post but edit)
+
+}

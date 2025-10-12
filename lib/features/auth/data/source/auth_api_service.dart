@@ -8,20 +8,21 @@ import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/auth/data/model/login_request_model.dart';
 
 abstract class AuthApiService {
-  Future<Either> login(LoginRequestModel loginRequestModel);
+  // Tentukan tipe secara spesifik: String untuk error, Response untuk sukses
+  Future<Either<String, Response>> login(LoginRequestModel loginRequestModel);
 }
 
 class AuthApiServiceImpl implements AuthApiService {
   @override
-  Future<Either> login(LoginRequestModel loginRequestModel) async {
+  Future<Either<String, Response>> login(LoginRequestModel loginRequestModel) async {
     try {
       var response = await sl<DioClient>().post(
         ApiUrls.login,
         data: loginRequestModel.toMap(),
       );
-      return Right(response.data);
-    }on DioException catch (e) {
-      return Left(e.response!.data['message'] ?? 'Login failed');
+      return Right(response);
+    } on DioException catch (e) {
+      return Left(e.response?.data['message']?.toString() ?? 'Login failed');
     }
   }
 }

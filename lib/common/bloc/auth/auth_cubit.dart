@@ -9,7 +9,7 @@ import 'package:gmedia_project/features/welcome/domain/usecase/set_first_run_com
 class AuthStateCubit extends Cubit<AuthState> {
   AuthStateCubit() : super(AppInitialState());
 
-  Future<void> _checkAuthStatus() async {
+  Future<void> checkAuthStatus() async {
     final bool isLoggedIn = await sl<IsLoggedInUseCase>().call(param: NoParams());
     if (isLoggedIn) {
       emit(Authenticated());
@@ -24,12 +24,12 @@ class AuthStateCubit extends Cubit<AuthState> {
     if (isFirstRun) {
       emit(FirstRun());
     } else {
-      await _checkAuthStatus();
+      await checkAuthStatus();
     }
   }
 
   void finishWelcomeScreen() async {
     await sl<SetFirstRunCompleteUsecase>().call(param: NoParams());
-    await _checkAuthStatus();
+    await checkAuthStatus();
   }
 }

@@ -7,6 +7,8 @@ import 'package:gmedia_project/features/auth/data/model/login_request_model.dart
 import 'package:gmedia_project/features/auth/domain/repository/auth_repository.dart';
 
 class SigninUsecases implements Usecase<Either, LoginRequestModel> {
+  SigninUsecases(AuthRepository authRepository);
+
   @override
   Future<Either> call({LoginRequestModel? param}) async {
     return sl<AuthRepository>().signIn(param!);

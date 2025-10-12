@@ -14,23 +14,17 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<bool> isLoggedIn() async {
     return await sl<AuthLocalService>().isLoggedIn();
   }
-
   @override
-  Future<Either> signIn(LoginRequestModel loginRequestModel) async {
-    Either result = await sl<AuthApiService>().login(loginRequestModel);
+  Future<Either<String, Response>> signIn(LoginRequestModel loginRequestModel) async { // Tambahkan tipe
+    Either<String, Response> result = await sl<AuthApiService>().login(loginRequestModel); // Tambahkan tipe
     return result.fold(
       (error) {
         return Left(error);
       },
       (data) async {
-        Response response = data;
-        SharedPreferences sharedPreferences =
-            await SharedPreferences.getInstance();
-        sharedPreferences.setString(
-          "token",
-          response.data['data']['token'],
-        );
-        return Right(response);
+        // 'data' di sini adalah Response utuh
+        await sl<AuthLocalService>().saveToken(data.data['data']['token']);
+        return Right(data);
       },
     );
   }
