@@ -1,0 +1,174 @@
+// lib/main.dart
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
+import 'package:gmedia_project/common/bloc/auth/auth_state.dart';
+import 'package:gmedia_project/core/services/services_locator.dart';
+
+void main() {
+  setUpServiceLocator();
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => AuthStateCubit()..appStarted(),
+      child: MaterialApp(
+        title: 'MASPOS',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: Colors.white,
+        ),
+        home: BlocBuilder<AuthStateCubit, AuthState>(
+          builder: ( context, state) {
+            if (state is Authenticated) {
+              return const Scaffold(
+                body: Center(
+                  child: Text('Authenticated'),
+                ),
+              );
+            } else if (state is UnAuthenticated) {
+              return const Scaffold(
+                body: Center(
+                  child: Text('UnAuthenticated'),
+                ),
+              );
+            } else {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );            }
+          },
+
+        ),
+      ),
+    );
+  }
+}
+
+
+
+// lib/pages/welcome_page.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart'; // Sesuaikan path ini
+
+class WelcomePage extends StatelessWidget {
+  const WelcomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Selamat Datang di Aplikasi MASPOS!',
+              style: TextStyle(fontSize: 24),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Memberi tahu Cubit bahwa proses 'first run' telah selesai
+                context.read<AuthStateCubit>().setFirstRunComplete();
+              },
+              child: const Text('Mulai Sekarang'),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+//lib/features/welcome/domain/repository/welcome_repository.dart
+
+abstract class WelcomeRepository {
+  Future<bool> isFirstRun();
+}
+
+
+|// lib/common/bloc/auth/auth_state.dart
+
+abstract class AuthState {}
+
+class AppInitialState extends AuthState {}
+
+class Authenticated extends AuthState {}
+
+class UnAuthenticated extends AuthState {}
+
+class FirstRun extends AuthState {}
+
+
+    // lib/common/bloc/auth/auth_cubit.dart
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gmedia_project/common/bloc/auth/auth_state.dart';
+import 'package:gmedia_project/core/services/services_locator.dart';
+import 'package:gmedia_project/features/auth/domain/usecase/is_logged_in.dart';
+import 'package:gmedia_project/features/welcome/domain/usecase/is_first_run_usecase.dart';
+// Anggap Anda punya Usecase untuk MENYIMPAN status first run
+import 'package:gmedia_project/features/welcome/domain/usecase/set_first_run_complete_usecase.dart';
+
+class AuthStateCubit extends Cubit<AuthState> {
+  AuthStateCubit() : super(AppInitialState());
+
+  /// Fungsi privat untuk mengecek status login.
+  /// Ini adalah inti dari prinsip DRY, logikanya terpusat di sini.
+  Future<void> _checkAuthStatus() async {
+    // Memanggil usecase untuk mengecek apakah ada token/sesi aktif
+    final bool isLoggedIn = await sl<IsLoggedInUseCase>().call();
+    if (isLoggedIn) {
+      emit(Authenticated());
+    } else {
+      emit(UnAuthenticated());
+    }
+  }
+
+  /// Metode utama yang dipanggil saat aplikasi pertama kali berjalan.
+  void appStarted() async {
+    // 1. Pertama, cek apakah ini adalah 'first run' atau bukan.
+    final bool isFirstRun = await sl<IsFirstRunUsecase>().call();
+    
+    if (isFirstRun) {
+      // Jika ya, tampilkan halaman welcome
+      emit(FirstRun());
+    } else {
+      // 2. Jika bukan, lanjutkan ke pengecekan status login.
+      await _checkAuthStatus();
+    }
+  }
+
+  /// Metode ini dipanggil dari WelcomePage setelah pengguna menekannya.
+  void finishWelcomeScreen() async {
+    await sl<SetFirstRunCompleteUseCase>().call();
+    await _checkAuthStatus();
+  }
+}
+
+// lib/core/services/services_locator.dart
+
+import 'package:get_it/get_it.dart';
+import 'package:gmedia_project/core/network/dio_client.dart';
+import 'package:gmedia_project/features/auth/domain/usecase/is_logged_in.dart';
+import 'package:gmedia_project/features/auth/domain/usecase/signin_usecases.dart';
+
+final sl = GetIt.instance;
+
+void setUpServiceLocator(){
+  sl.registerSingleton<DioClient>(DioClient());
+  sl.registerSingleton<IsLoggedInUseCase>(IsLoggedInUseCase());
+  sl.registerSingleton<SigninUsecases>(SigninUsecases());
+  // sl.registerSingleton<AuthRepository>(AuthRepository());
+}
+
+
+

@@ -1,3 +1,7 @@
-abstract class Usecase<Type, Param> {
-  Future<Type> call({Param param});
+// lib/core/usecase/usecase.dart
+
+class NoParams {}
+
+abstract class Usecase<T, Param> {
+  Future<T> call({Param? param});
 }

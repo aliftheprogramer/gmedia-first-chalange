@@ -1,3 +1,5 @@
+// lib/main.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
@@ -40,9 +42,9 @@ class MyApp extends StatelessWidget {
                 body: Center(
                   child: CircularProgressIndicator(),
                 ),
-              );
-            }
+              );            }
           },
+
         ),
       ),
     );
