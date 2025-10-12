@@ -1,7 +1,9 @@
+// lib/features/auth/domain/repository/auth_repository.dart
+
 import 'package:dartz/dartz.dart';
-import 'package:gmedia_project/features/auth/domain/entities/login_request_entity.dart';
+import 'package:gmedia_project/features/auth/data/model/login_request_model.dart';
 
 abstract class AuthRepository {
-  Future<Either> signIn(LoginRequestEntity loginRequestEntity);
+  Future<Either> signIn(LoginRequestModel loginRequestModel);
   Future<bool> isLoggedIn();
 }
