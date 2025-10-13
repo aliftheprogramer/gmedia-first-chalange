@@ -1,0 +1,1 @@
+// lib/features/welcome/presentation/cubit/welcome_state.dart
