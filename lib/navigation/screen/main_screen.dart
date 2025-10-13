@@ -22,7 +22,7 @@ class MainScreen extends StatelessWidget {
     return BlocBuilder<NavigationCubit, int>(
       builder: (context, state) {
         return Scaffold(
-          extendBody: true, // Membuat body bisa berada di belakang navbar
+          extendBody: true, 
           appBar: AppBar(
             title: const Text('MASPOS'),
           ),
