@@ -1,6 +1,7 @@
 // lib/core/services/services_locator.dart
 
 import 'package:get_it/get_it.dart';
+import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
 import 'package:gmedia_project/features/auth/presentation/cubit/visible/password_visible_state.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,5 +55,6 @@ Future<void> setUpServiceLocator() async {
   // Cubits
   sl.registerFactory(() => PasswordVisibleCubit());
   sl.registerFactory(() => LoginCubit());
-  sl.registerFactory(() => NavigationCubit()); 
+  sl.registerFactory(() => NavigationCubit());
+  sl.registerFactory(() => AuthStateCubit());
 }

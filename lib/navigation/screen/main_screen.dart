@@ -1,13 +1,15 @@
+// lib/navigation/screen/main_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/features/home/presentation/pages/home_screen.dart';
 import 'package:gmedia_project/features/product/presentation/page/product_screen.dart';
 import 'package:gmedia_project/features/profile/presentation/page/profile_screen.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
-import 'package:gmedia_project/navigation/widgets/custom_navbar.dart';
+import 'package:gmedia_project/widget/custom_navbar.dart';
 
 class MainScreen extends StatelessWidget {
-   const MainScreen({super.key});
+  const MainScreen({super.key});
 
   final List<Widget> _pages = const [
     HomeScreen(),
@@ -20,10 +22,12 @@ class MainScreen extends StatelessWidget {
     return BlocBuilder<NavigationCubit, int>(
       builder: (context, state) {
         return Scaffold(
+          extendBody: true, // Membuat body bisa berada di belakang navbar
           appBar: AppBar(
-            title: const Text('Clean Bottom Nav Bar'),
+            title: const Text('MASPOS'),
           ),
           body: _pages[state],
+          
           bottomNavigationBar: CustomBottomNavBar(
             currentIndex: state,
             onTap: (index) => context.read<NavigationCubit>().updateIndex(index),

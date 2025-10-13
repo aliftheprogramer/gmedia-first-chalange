@@ -7,9 +7,8 @@ import 'package:gmedia_project/common/bloc/auth/auth_state.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/auth/presentation/pages/login_page.dart';
 import 'package:gmedia_project/features/welcome/presentation/page/welcome_page.dart';
+import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 import 'package:gmedia_project/navigation/screen/main_screen.dart';
-
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,8 +21,11 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthStateCubit()..appStarted(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => sl<AuthStateCubit>()..appStarted()),
+        BlocProvider(create: (context) => sl<NavigationCubit>()),
+      ],
       child: MaterialApp(
         title: 'MASPOS',
         theme: ThemeData(
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
         ),
         home: BlocBuilder<AuthStateCubit, AuthState>(
-          builder: ( context, state) {
+          builder: (context, state) {
             if (state is FirstRun) {
               return const WelcomePage();
             } else if (state is Authenticated) {
@@ -40,9 +42,7 @@ class MyApp extends StatelessWidget {
               return const LoginPage();
             } else {
               return const Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
+                body: Center(child: CircularProgressIndicator()),
               );
             }
           },

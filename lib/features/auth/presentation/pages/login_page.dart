@@ -25,11 +25,6 @@ class LoginPage extends StatelessWidget {
         body: BlocListener<LoginCubit, LoginState>(
           listener: (context, state) {
             if (state is LoginSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('Login Berhasil!'),
-                    backgroundColor: Colors.green),
-              );
               context.read<AuthStateCubit>().checkAuthStatus();
             } else if (state is LoginFailure) {
               ScaffoldMessenger.of(context).showSnackBar(

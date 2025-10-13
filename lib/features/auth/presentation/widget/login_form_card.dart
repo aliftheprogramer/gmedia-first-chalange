@@ -58,8 +58,7 @@ class _LoginFormCardState extends State<LoginFormCard> {
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 24),
-                
-                // Gunakan CustomTextField untuk Username
+              
                 CustomTextField(
                   controller: _emailController,
                   label: 'Username',
@@ -68,8 +67,6 @@ class _LoginFormCardState extends State<LoginFormCard> {
                 ),
 
                 const SizedBox(height: 16),
-
-                // Gunakan CustomTextField untuk Password, dibungkus BlocBuilder
                 BlocBuilder<PasswordVisibleCubit, PasswordVisibleState>(
                   builder: (context, state) {
                     final isHidden = state is PasswordIsHidden;
