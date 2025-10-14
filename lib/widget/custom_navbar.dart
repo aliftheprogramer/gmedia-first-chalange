@@ -42,7 +42,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 children: [
                   // Tombol Home
                   _buildNavItem(
-                    icon: Icons.home_filled,
+                    icon: Icons.home,
                     index: 0,
                     isSelected: currentIndex == 0,
                     onTap: () => onTap(0),
