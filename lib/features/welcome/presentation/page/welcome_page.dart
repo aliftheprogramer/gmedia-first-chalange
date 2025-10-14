@@ -1,6 +1,8 @@
 // lib/pages/welcome_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
 // Ganti dengan path cubit Anda yang benar jika diperlukan
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
@@ -102,11 +104,10 @@ class WelcomePage extends StatelessWidget {
                       elevation: 5,
                     ),
                     onPressed: () {
-                      // context.read<AuthStateCubit>().finishWelcomeScreen();
-                      print('Tombol "Yuk mulai cobain" ditekan!');
+                      context.read<AuthStateCubit>().finishWelcomeScreen();
                     },
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         const Text('Yuk mulai cobain',
                             style: TextStyle(fontSize: 16)),
