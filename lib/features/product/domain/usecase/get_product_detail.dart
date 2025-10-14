@@ -6,6 +6,7 @@ import 'package:gmedia_project/features/product/domain/repository/product_reposi
 
 class GetProductDetail
     implements Usecase<DataState<ProductEntityResponse>, String?> {
+  GetProductDetail(ProductRepository repository);
   @override
   Future<DataState<ProductEntityResponse>> call({String? param}) {
     return sl<ProductRepository>().getProductById(param!);

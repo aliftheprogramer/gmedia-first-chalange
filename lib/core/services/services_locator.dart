@@ -3,6 +3,10 @@
 import 'package:get_it/get_it.dart';
 import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
 import 'package:gmedia_project/features/auth/presentation/cubit/visible/password_visible_state.dart';
+import 'package:gmedia_project/features/product/domain/usecase/add_product_usecase.dart';
+import 'package:gmedia_project/features/product/domain/usecase/delete_product_usecase.dart';
+import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
+import 'package:gmedia_project/features/product/domain/usecase/get_product_detail.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gmedia_project/core/network/dio_client.dart';
@@ -51,6 +55,10 @@ Future<void> setUpServiceLocator() async {
   sl.registerLazySingleton(() => SigninUsecases(sl()));
   sl.registerLazySingleton(() => IsFirstRunUsecase(sl()));
   sl.registerLazySingleton(() => SetFirstRunCompleteUsecase(sl()));
+  sl.registerLazySingleton(() => DeleteProductUsecase(sl()));
+  sl.registerLazySingleton(() => AddProductUsecase(sl()));
+  sl.registerLazySingleton(() => GetProductDetail(sl()));
+  sl.registerLazySingleton(() => GetListProductUsecase(sl()));
 
   // Cubits
   sl.registerFactory(() => PasswordVisibleCubit());

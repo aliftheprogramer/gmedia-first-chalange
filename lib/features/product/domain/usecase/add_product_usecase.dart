@@ -6,6 +6,7 @@ import 'package:gmedia_project/features/product/domain/entity/product_entity_res
 import 'package:gmedia_project/features/product/domain/repository/product_repository.dart';
 
 class AddProductUsecase implements Usecase<DataState<ProductEntityResponse>, ProductRequestEntity> {
+  AddProductUsecase(ProductRepository repository);
   @override
   Future<DataState<ProductEntityResponse>> call({ProductRequestEntity? param}) async {
     return await sl<ProductRepository>().createProduct(param!);
