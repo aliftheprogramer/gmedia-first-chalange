@@ -1,80 +1,72 @@
 // lib/pages/welcome_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
+// Ganti dengan path cubit Anda yang benar jika diperlukan
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
 
-class WelcomePage extends StatefulWidget {
+class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
 
-  @override
-  State<WelcomePage> createState() => _WelcomePageState();
-}
-
-class _WelcomePageState extends State<WelcomePage> {
+  // DIHAPUS: List gambar dan fungsi _buildImageCircle tidak lagi digunakan.
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Full-screen background gradient (back-most layer)
+          // DIUBAH: Urutan layer di dalam Stack diatur ulang.
+
+          // LAPISAN 1 (PALING BELAKANG): Wallpaper gambar.
           Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFFFFFFFF), // top solid white
-                    Color(0xFFAABCF4), // bottom solid AABCF4
-                  ],
-                ),
+            child: _buildWallpaper(),
+          ),
+
+          // LAPISAN 2: Gradient overlay (semi-transparan) di atas wallpaper.
+          // Ini memberi efek warna pada wallpaper di belakangnya.
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  // Diberi sedikit opacity agar gambar wallpaper tetap terlihat
+                  Colors.white.withOpacity(0.1),
+                  const Color(0xFFAABCF4).withOpacity(0.8),
+                ],
               ),
             ),
           ),
-          // Tiga gambar berdampingan (tanpa scroll)
-          Positioned.fill(
-            child: _buildImageRow(
-              'assets/variant1.png',
-              'assets/variant4.png',
-              'assets/variant2.png',
-            ),
-          ),
-          // Rectangle gradient di belakang text, dibuat invisible (opacity 0)
+
+          // LAPISAN 3: Gradient Putih di Atas untuk Keterbacaan Teks (tetap ada)
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            child: Opacity(
-              opacity: 0,
-              child: Container(
-                height: MediaQuery.of(context).size.height * 0.5,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFFFFFFFF), // putih 100%
-                      Color(0xFFFFFFFF), // tahan putih di area atas
-                      Color(0x00AABCF4), // AABCF4 transparan 0%
-                    ],
-                    stops: [0.0, 0.4, 1.0], // atur 40% bagian atas tetap putih
-                  ),
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.4,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white.withOpacity(1.0),
+                    Colors.white.withOpacity(0.8),
+                    Colors.white.withOpacity(0.0),
+                  ],
+                  stops: const [0.0, 0.5, 1.0],
                 ),
               ),
             ),
           ),
 
+          // LAPISAN 4: UI Utama (Teks dan Tombol)
           SafeArea(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start, 
-              crossAxisAlignment: CrossAxisAlignment.stretch, 
               children: [
-                // Container sekarang akan benar-benar full lebar dan full ke atas tanpa margin
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(24, 56, 24, 16), // Top padding lebih besar untuk kompensasi status bar
+                  padding: const EdgeInsets.fromLTRB(24, 56, 24, 16),
                   child: Text.rich(
                     TextSpan(
                       style: Theme.of(context).textTheme.headlineLarge?.copyWith(
@@ -86,40 +78,49 @@ class _WelcomePageState extends State<WelcomePage> {
                         TextSpan(text: 'Kasir Pintar, Bisnis Lancar!\nYuk, Coba'),
                         TextSpan(
                           text: ' MASPOS',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff1843C3)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xff1843C3)),
                         ),
                       ],
                     ),
                     textAlign: TextAlign.center,
-                    softWrap: true,
                   ),
                 ),
-                // 4. Kembalikan Spacer tunggal untuk mendorong tombol ke bawah
-                const Spacer(), 
+                const Spacer(),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 40.0),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2C59E5),
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 56),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(16),
                       ),
+                      elevation: 5,
                     ),
                     onPressed: () {
-                      context.read<AuthStateCubit>().finishWelcomeScreen();
+                      // context.read<AuthStateCubit>().finishWelcomeScreen();
+                      print('Tombol "Yuk mulai cobain" ditekan!');
                     },
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Yuk mulai cobain', style: TextStyle(fontSize: 16)),
-                        SizedBox(width: 34),
-                        Row(children: [
-                          Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white.withOpacity(0.3)),
-                          Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white.withOpacity(0.6)),
-                          Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white.withOpacity(1)),
-                        ]),
+                        const Text('Yuk mulai cobain',
+                            style: TextStyle(fontSize: 16)),
+                        const SizedBox(width: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.arrow_forward_ios,
+                                size: 14, color: Colors.white.withOpacity(0.3)),
+                            Icon(Icons.arrow_forward_ios,
+                                size: 14, color: Colors.white.withOpacity(0.6)),
+                            const Icon(Icons.arrow_forward_ios,
+                                size: 14, color: Colors.white),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -131,25 +132,30 @@ class _WelcomePageState extends State<WelcomePage> {
       ),
     );
   }
-  Widget _buildImageRow(String path1, String path2, String path3) {
+
+  // BARU: Fungsi untuk membuat wallpaper layar penuh dari tiga gambar.
+  Widget _buildWallpaper() {
     return Row(
+      // crossAxisAlignment.stretch membuat anak-anak Row meregang secara vertikal.
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // Expanded memastikan setiap gambar mengambil sepertiga dari lebar layar.
         Expanded(
           child: Image.asset(
-            path1,
+            'assets/variant1.png',
+            // BoxFit.cover membuat gambar memenuhi ruang tanpa merusak rasio aspeknya.
             fit: BoxFit.cover,
           ),
         ),
         Expanded(
           child: Image.asset(
-            path2,
+            'assets/variant2.png',
             fit: BoxFit.cover,
           ),
         ),
         Expanded(
           child: Image.asset(
-            path3,
+            'assets/variant3.png',
             fit: BoxFit.cover,
           ),
         ),
