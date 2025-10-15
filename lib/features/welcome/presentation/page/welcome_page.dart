@@ -3,44 +3,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
-// Ganti dengan path cubit Anda yang benar jika diperlukan
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
-
-  // DIHAPUS: List gambar dan fungsi _buildImageCircle tidak lagi digunakan.
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // DIUBAH: Urutan layer di dalam Stack diatur ulang.
-
           // LAPISAN 1 (PALING BELAKANG): Wallpaper gambar.
           Positioned.fill(
             child: _buildWallpaper(),
           ),
 
           // LAPISAN 2: Gradient overlay (semi-transparan) di atas wallpaper.
-          // Ini memberi efek warna pada wallpaper di belakangnya.
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  // Diberi sedikit opacity agar gambar wallpaper tetap terlihat
-                  Colors.white.withOpacity(0.1),
-                  const Color(0xFFAABCF4).withOpacity(0.8),
+                  // Bagian atas tetap sama
+                  Colors.white.withOpacity(0.8),
+                  // DIPERBAIKI: Opacity warna biru dikurangi agar lebih cerah
+                  const Color(0xFFAABCF4).withOpacity(0.6),
                 ],
+                // Menyesuaikan titik henti gradien agar transisi lebih halus
+                stops: const [0.0, 1.0],
               ),
             ),
           ),
 
-          // LAPISAN 3: Gradient Putih di Atas untuk Keterbacaan Teks (tetap ada)
+          // LAPISAN 3: Gradient Putih di Atas untuk Keterbacaan Teks
           Positioned(
             top: 0,
             left: 0,
@@ -99,7 +94,7 @@ class WelcomePage extends StatelessWidget {
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 56),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       elevation: 5,
                     ),
@@ -126,6 +121,7 @@ class WelcomePage extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 40),
               ],
             ),
           ),
@@ -134,30 +130,35 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  // BARU: Fungsi untuk membuat wallpaper layar penuh dari tiga gambar.
   Widget _buildWallpaper() {
     return Row(
-      // crossAxisAlignment.stretch membuat anak-anak Row meregang secara vertikal.
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Expanded memastikan setiap gambar mengambil sepertiga dari lebar layar.
         Expanded(
-          child: Image.asset(
-            'assets/variant1.png',
-            // BoxFit.cover membuat gambar memenuhi ruang tanpa merusak rasio aspeknya.
-            fit: BoxFit.cover,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 5.0),
+            child: Image.asset(
+              'assets/variant1.png',
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         Expanded(
-          child: Image.asset(
-            'assets/variant2.png',
-            fit: BoxFit.cover,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Image.asset(
+              'assets/variant2.png',
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         Expanded(
-          child: Image.asset(
-            'assets/variant3.png',
-            fit: BoxFit.cover,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5.0),
+            child: Image.asset(
+              'assets/variant3.png',
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ],
