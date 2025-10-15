@@ -25,9 +25,12 @@ class MainScreen extends StatelessWidget {
           extendBody: true, 
           body: _pages[state],
           
-          bottomNavigationBar: CustomBottomNavBar(
-            currentIndex: state,
-            onTap: (index) => context.read<NavigationCubit>().updateIndex(index),
+          bottomNavigationBar: Container(
+            color: Colors.transparent, // Paksa transparan
+            child: CustomBottomNavBar(
+              currentIndex: state,
+              onTap: (index) => context.read<NavigationCubit>().updateIndex(index),
+            ),
           ),
         );
       },
