@@ -8,7 +8,7 @@ import 'package:gmedia_project/features/product/data/source/product_api_service.
 import 'package:gmedia_project/features/product/domain/entity/product_entity_request.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
 import 'package:gmedia_project/features/product/domain/repository/product_repository.dart';
-import 'package:gmedia_project/features/product/domain/usecase/search_product_query.dart';
+import 'package:gmedia_project/features/product/domain/usecase/param/search_product_query.dart';
 
 class ProductRepositoryImpl implements ProductRepository {
   final ProductApiService _productApiService = sl<ProductApiService>();
