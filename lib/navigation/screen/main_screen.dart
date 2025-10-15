@@ -23,9 +23,6 @@ class MainScreen extends StatelessWidget {
       builder: (context, state) {
         return Scaffold(
           extendBody: true, 
-          appBar: AppBar(
-            title: const Text('MASPOS'),
-          ),
           body: _pages[state],
           
           bottomNavigationBar: CustomBottomNavBar(

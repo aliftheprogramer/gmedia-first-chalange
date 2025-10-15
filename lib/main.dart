@@ -27,7 +27,6 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<NavigationCubit>()),
       ],
       child: MaterialApp(
-        title: 'MASPOS',
         theme: ThemeData(
           primarySwatch: Colors.blue,
           scaffoldBackgroundColor: Colors.white,
