@@ -1,7 +1,7 @@
 import 'package:gmedia_project/core/resources/data_state.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_request.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
-import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
+import 'package:gmedia_project/features/product/domain/usecase/search_product_query.dart';
 
 abstract class ProductRepository {
   Future<DataState<List<ProductEntityResponse>>> getProducts(GetListProductParams? params);

@@ -7,9 +7,10 @@ import 'package:gmedia_project/core/resources/data_state.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/product/data/model/product_model_request.dart';
 import 'package:gmedia_project/features/product/data/model/product_model_response.dart';
+import 'package:gmedia_project/features/product/domain/usecase/search_product_query.dart';
 
 abstract class ProductApiService {
-  Future<DataState<List<ProductResponseModel>>> getProducts();
+  Future<DataState<List<ProductResponseModel>>> getProducts(GetListProductParams? params);
   Future<DataState<ProductResponseModel>> getProductById(String id);
   Future<DataState<ProductResponseModel>> createProduct(ProductRequestModel product);
   Future<DataState<ProductResponseModel>> updateProduct(String id, ProductRequestModel product);
@@ -19,15 +20,17 @@ abstract class ProductApiService {
 class ProductApiServiceImpl implements ProductApiService {
   final DioClient _dioClient = sl<DioClient>();
 
+
   @override
-  Future<DataState<List<ProductResponseModel>>> getProducts() async {
+  Future<DataState<List<ProductResponseModel>>> getProducts(GetListProductParams? params) async {
     try {
-      final response = await _dioClient.get(ApiUrls.product);
+      final response = await _dioClient.get(
+        ApiUrls.product,
+        queryParameters: params?.toJson(), 
+      );
 
       if (response.statusCode == 200) {
-
         final List<dynamic> productListJson = response.data['data'];
-
         final List<ProductResponseModel> products = productListJson
             .map((productJson) => ProductResponseModel.fromJson(productJson as Map<String, dynamic>))
             .toList();
@@ -46,7 +49,6 @@ class ProductApiServiceImpl implements ProductApiService {
       return DataFailed(e);
     }
   }
-
   @override
   Future<DataState<ProductResponseModel>> getProductById(String id) async {
     try {
