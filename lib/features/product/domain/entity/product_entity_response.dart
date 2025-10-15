@@ -1,3 +1,5 @@
+// lib/features/product/domain/entity/product_entity_response.dart
+
 class ProductEntityResponse {
   final String id;
   final String categoryId;
