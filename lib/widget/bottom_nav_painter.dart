@@ -6,12 +6,12 @@ class BottomNavPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
-      ..color = Colors.white
+      ..color = Colors.black
       ..style = PaintingStyle.fill;
 
     Path path = Path();
 
-    const double topY = 15.0;
+    const double topY = 26.0;
     double center = size.width / 2;
     double bumpWidth = 110.0;
     double bumpHeight = 15.0;
