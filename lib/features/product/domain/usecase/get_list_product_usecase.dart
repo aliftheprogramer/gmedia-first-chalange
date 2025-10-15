@@ -20,6 +20,6 @@ class GetListProductUsecase
   @override
   Future<DataState<List<ProductEntityResponse>>> call(
       {GetListProductParams? param}) {
-    return repository.getProducts(param?.categoryId, param?.search);
+    return repository.getProducts(param);
   }
 }
