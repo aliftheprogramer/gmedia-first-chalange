@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/home/presentation/provider/home_provider.dart';
 import 'package:gmedia_project/features/home/presentation/widget/custom_search_bar.dart';
+import 'package:gmedia_project/features/home/presentation/widget/favourote_product_widget.dart';
 import 'package:gmedia_project/features/home/presentation/widget/hero_section_widget.dart';
 import 'package:gmedia_project/features/home/presentation/widget/home_app_bar.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
@@ -47,8 +48,7 @@ class HomeScreen extends StatelessWidget {
         
               const SizedBox(height: 24),
         
-              // Di sini nanti kita akan menambahkan bagian "Diminati pembeli"
-              // dan "Produk yang dijual"
+              const FavouroteProductWidget(),
             ],
           ),
         ),

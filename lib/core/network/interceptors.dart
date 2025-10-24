@@ -38,10 +38,16 @@ class LoggerInterceptor extends Interceptor {
     // 1. Ambil SharedPreferences
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    // 2. Cek apakah token ada
-    if (sharedPreferences.containsKey("access_token")) {
-      // 3. Ambil token dan tambahkan ke header
-      String? token = sharedPreferences.getString("access_token");
+    // 2. Cek apakah token ada. Support both 'token' and 'access_token' keys for compatibility.
+    String? token;
+    if (sharedPreferences.containsKey('token')) {
+      token = sharedPreferences.getString('token');
+    } else if (sharedPreferences.containsKey('access_token')) {
+      token = sharedPreferences.getString('access_token');
+    }
+
+    if (token != null && token.isNotEmpty) {
+      // 3. Tambahkan header Authorization jika token tersedia
       options.headers['Authorization'] = 'Bearer $token';
     }
 
