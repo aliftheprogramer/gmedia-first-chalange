@@ -1,7 +1,6 @@
 // lib/widget/custom_navbar.dart
 
 import 'package:flutter/material.dart';
-import 'bottom_nav_painter.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;

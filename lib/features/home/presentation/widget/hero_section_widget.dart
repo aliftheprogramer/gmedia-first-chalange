@@ -15,28 +15,40 @@ class _HeroSectionWidgetState extends State<HeroSectionWidget> {
   late final PageController _pageController;
   late final Timer _timer;
   int _currentPage = 0;
-  // Cache aspect ratios for each asset so height can follow original image
+
   final Map<String, double> _assetAspectRatios = {};
+  final Set<String> _listeningAssets = {};
 
   void _ensureAspectRatio(String assetPath) {
-    if (_assetAspectRatios.containsKey(assetPath)) return;
-    final provider = AssetImage(assetPath);
-    final stream = provider.resolve(const ImageConfiguration());
-    stream.addListener(
-      ImageStreamListener((info, _) {
-        final ratio = info.image.width / info.image.height;
-        if (!mounted) return;
-        setState(() {
-          _assetAspectRatios[assetPath] = ratio.toDouble();
-        });
-      }, onError: (_, __) {
-        if (!mounted) return;
-        // Fallback to 2:1 if decode fails
-        setState(() {
-          _assetAspectRatios[assetPath] = 2.0;
-        });
-      }),
-    );
+    if (_assetAspectRatios.containsKey(assetPath) || _listeningAssets.contains(assetPath)) return;
+    _listeningAssets.add(assetPath);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final provider = AssetImage(assetPath);
+      final stream = provider.resolve(const ImageConfiguration());
+      stream.addListener(
+        ImageStreamListener((info, _) {
+          final ratio = info.image.width / info.image.height;
+          if (!mounted) return;
+          // Update state dengan aman setelah frame
+          WidgetsBinding.instance.addPostFrameCallback((__) {
+            if (!mounted) return;
+            setState(() {
+              _assetAspectRatios[assetPath] = ratio.toDouble();
+            });
+          });
+        }, onError: (_, __) {
+          if (!mounted) return;
+          WidgetsBinding.instance.addPostFrameCallback((__) {
+            if (!mounted) return;
+            setState(() {
+              _assetAspectRatios[assetPath] = 2.0;
+            });
+          });
+        }),
+      );
+    });
   }
 
   @override
@@ -60,6 +72,16 @@ class _HeroSectionWidgetState extends State<HeroSectionWidget> {
         }
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final provider = context.read<HomeProvider>();
+    for (final b in provider.banners) {
+      precacheImage(AssetImage(b.imagePath), context);
+    }
   }
 
   @override
@@ -93,12 +115,12 @@ class _HeroSectionWidgetState extends State<HeroSectionWidget> {
         }
 
         // Determine dynamic height based on current banner aspect ratio
-        final screenWidth = MediaQuery.of(context).size.width;
-        final pageWidth = screenWidth * 0.9; // matches viewportFraction
-        final safeIndex = _currentPage.clamp(0, provider.banners.length - 1);
-        final currentPath = provider.banners[safeIndex].imagePath;
-        final currentRatio = _assetAspectRatios[currentPath] ?? 2.0; // default 2:1
-        final bannerHeight = pageWidth / currentRatio;
+  final screenWidth = MediaQuery.of(context).size.width;
+  final pageWidth = screenWidth * 0.9; // matches viewportFraction
+  final safeIndex = _currentPage.clamp(0, provider.banners.length - 1);
+  final currentPath = provider.banners[safeIndex].imagePath;
+  final currentRatio = _assetAspectRatios[currentPath] ?? 2.0; // default 2:1
+  final bannerHeight = (currentRatio > 0) ? pageWidth / currentRatio : pageWidth / 2.0;
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),

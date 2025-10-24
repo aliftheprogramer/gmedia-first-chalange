@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
               context.read<NavigationCubit>().updateIndex(2);
             },
           ),
-          backgroundColor: Colors.transparent,
+          backgroundColor: Color(0xFFD6DFFA),
           body: ListView(
             padding: EdgeInsets.zero,
             children: [

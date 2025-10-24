@@ -29,7 +29,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         theme: ThemeData(
           primarySwatch: Colors.blue,
-          scaffoldBackgroundColor: Colors.white,
+          scaffoldBackgroundColor: Color(0xFFD6DFFA),
+          // scaffoldBackgroundColor: Colors.white,
+
         ),
         home: BlocBuilder<AuthStateCubit, AuthState>(
           builder: (context, state) {
