@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/services.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? profileImageUrl;
@@ -20,8 +21,13 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      elevation: 1,
-      backgroundColor: Colors.white.withOpacity(0),
+      elevation: 0,
+      backgroundColor: const Color(0xFFEBF0FD),
+      systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarColor: Color(0xFFEBF0FD),
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
       title: const Text(
         'MASPOS',
         style: TextStyle(
@@ -46,7 +52,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             customBorder: const CircleBorder(),
             child: CircleAvatar(
               radius: 18,
-              backgroundColor: Colors.grey[200],
+              backgroundColor: Color(0xFFEBF0FD),
               child: ClipOval(
                 child: profileImageUrl != null
                     ? CachedNetworkImage(

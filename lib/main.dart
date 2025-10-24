@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         theme: ThemeData(
           primarySwatch: Colors.blue,
-          scaffoldBackgroundColor: Color(0xFFD6DFFA),
+          scaffoldBackgroundColor: Color(0xFFEBF0FD),
           // scaffoldBackgroundColor: Colors.white,
 
         ),

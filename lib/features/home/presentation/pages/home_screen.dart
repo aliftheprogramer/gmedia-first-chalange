@@ -24,12 +24,13 @@ class HomeScreen extends StatelessWidget {
         child: Scaffold(
           
           appBar: HomeAppBar(
+            
             profileImageUrl: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
             onProfileTap: () {
               context.read<NavigationCubit>().updateIndex(2);
             },
           ),
-          backgroundColor: Color(0xFFD6DFFA),
+          backgroundColor: Color(0xFFEBF0FD),
           body: ListView(
             padding: EdgeInsets.zero,
             children: [
@@ -49,6 +50,10 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
         
               const FavouroteProductWidget(),
+
+              const SizedBox(height: 24),
+
+              
             ],
           ),
         ),

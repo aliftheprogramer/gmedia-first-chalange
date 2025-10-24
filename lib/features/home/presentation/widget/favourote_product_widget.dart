@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:logger/logger.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
-import 'package:gmedia_project/features/home/presentation/cubit/favorite_product_cubit.dart';
-import 'package:gmedia_project/features/home/presentation/cubit/favorite_product_state.dart';
+import 'package:gmedia_project/features/home/presentation/cubit/favorite/favorite_product_cubit.dart';
+import 'package:gmedia_project/features/home/presentation/cubit/favorite/favorite_product_state.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
 import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
 
@@ -19,47 +19,54 @@ class FavouroteProductWidget extends StatelessWidget {
         cubit.fetchFavorites();
         return cubit;
       },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Diminati Pembeli 😍'),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 180,
-            child: BlocBuilder<FavoriteProductCubit, FavoriteProductState>(
-              builder: (context, state) {
-                if (state is FavoriteProductLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (state is FavoriteProductEmpty) {
-                  return const Center(child: Text('Tidak ada produk favorit.'));
-                }
-
-                if (state is FavoriteProductError) {
-                  return Center(child: Text('Error: ${state.message}'));
-                }
-
-                if (state is FavoriteProductLoaded) {
-                  final products = state.products.cast<ProductEntityResponse>();
-                  return ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    itemCount: products.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 12),
-                    itemBuilder: (context, index) {
-                      final p = products[index];
-                      return _FavoriteProductItem(product: p);
-                    },
-                  );
-                }
-
-                // Default placeholder for initial state
-                return const SizedBox.shrink();
-              },
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: const Text('Diminati Pembeli 😍', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 220,
+              child: BlocBuilder<FavoriteProductCubit, FavoriteProductState>(
+                builder: (context, state) {
+                  if (state is FavoriteProductLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+        
+                  if (state is FavoriteProductEmpty) {
+                    return const Center(child: Text('Tidak ada produk favorit.'));
+                  }
+        
+                  if (state is FavoriteProductError) {
+                    return Center(child: Text('Error: ${state.message}'));
+                  }
+        
+                  if (state is FavoriteProductLoaded) {
+                    final products = state.products.cast<ProductEntityResponse>();
+                    return ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      itemCount: products.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (context, index) {
+                        final p = products[index];
+                        return _FavoriteProductItem(product: p);
+                      },
+                    );
+                  }
+        
+                  // Default placeholder for initial state
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -79,9 +86,9 @@ class _FavoriteProductItem extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: SizedBox(
+              child: SizedBox(
               width: 140,
-              height: 100,
+              height: 140,
               child: Builder(builder: (context) {
                 if (product.pictureUrl.isEmpty) {
                   return Container(
@@ -90,7 +97,7 @@ class _FavoriteProductItem extends StatelessWidget {
                   );
                 }
 
-                // Normalize http -> https to avoid mixed-content blocks on web
+
                 String imageUrl = product.pictureUrl.trim();
                 if (imageUrl.startsWith('http://')) {
                   imageUrl = imageUrl.replaceFirst('http://', 'https://');
@@ -110,9 +117,7 @@ class _FavoriteProductItem extends StatelessWidget {
                     try {
                       logger.e('Failed loading product image');
                     } catch (_) {
-                      // fallback to print if logger isn't available
-                      // ignore: avoid_print
-                      print('Image load error: $url -> $error');
+                      logger.e('Image load error: $url -> $error');
                     }
                     return Container(
                       color: Colors.grey[200],
@@ -123,18 +128,20 @@ class _FavoriteProductItem extends StatelessWidget {
               }),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             product.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             'Rp ${product.price}',
-            style: const TextStyle(fontSize: 13, color: Colors.grey),
+            style: const TextStyle(fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w300),
           ),
+
+
         ],
       ),
     );

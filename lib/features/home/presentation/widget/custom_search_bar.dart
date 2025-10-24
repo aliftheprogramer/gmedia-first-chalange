@@ -26,14 +26,15 @@ class SearchBarWidget extends StatelessWidget {
         onSubmitted: onSubmitted,
         decoration: InputDecoration(
           hintText: hintText,
-          prefixIcon: const Icon(Icons.search, color: Colors.grey),
+          hintStyle: const TextStyle(color: Colors.grey),
+          prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
           // Membuat border tidak terlihat
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.grey[200],
+          fillColor: Colors.white,
           contentPadding: EdgeInsets.zero, // Menyesuaikan padding internal
         ),
       ),
