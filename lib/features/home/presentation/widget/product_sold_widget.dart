@@ -7,6 +7,7 @@ import 'package:gmedia_project/features/home/presentation/cubit/product_sold/pro
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
 import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
 import 'package:gmedia_project/widget/custom_button_cart.dart';
+import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
 class ProductSoldWidget extends StatelessWidget {
@@ -14,92 +15,115 @@ class ProductSoldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(create: (_){
-      final cubit = ProductSoldCubit(sl<GetListProductUsecase>());
-      cubit.fetchSoldProducts();
-      return cubit;
-    },
-    child: Container(
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(padding: const EdgeInsets.all(16.0), child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Produk yang dijual', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-              InkWell(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Menampilkan semua produk')),
-                  );
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Text(
-                      'Lihat Semua',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(width: 6),
-                    Icon(Icons.arrow_forward_ios, size: 16, color: Colors.blue),
-                  ],
-                ),
-              ),
-            ],
-          ) ,),
-          const SizedBox(height: 12,),
-          // Use a grid with 2 columns; let parent ListView scroll (so grid is shrinkWrapped)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: BlocBuilder<ProductSoldCubit, ProductSoldState>(builder: (context, state){
-              if (state is ProductSoldLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (state is ProductSoldEmpty) {
-                return const Center(child: Text('Tidak ada produk yang dijual.'));
-              }
-
-              if (state is ProductSoldError) {
-                return Center(child: Text('Error: ${state.message}'));
-              }
-
-              if (state is ProductSoldLoaded) {
-                final products = state.products.cast<ProductEntityResponse>();
-                return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 0.9,
+    return BlocProvider(
+      create: (_) {
+        final cubit = ProductSoldCubit(sl<GetListProductUsecase>());
+        cubit.fetchSoldProducts();
+        return cubit;
+      },
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Produk yang dijual',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    final p = products[index];
-                    return ProductSoldItem(product: p);
-                  },
-                );
-              }
+                  InkWell(
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Menampilkan semua produk'),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Text(
+                          'Lihat Semua',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(width: 6),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                          color: Colors.blue,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Use a grid with 2 columns; let parent ListView scroll (so grid is shrinkWrapped)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: BlocBuilder<ProductSoldCubit, ProductSoldState>(
+                builder: (context, state) {
+                  if (state is ProductSoldLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-              return const SizedBox.shrink();
-            }),
-          )
-        ],
+                  if (state is ProductSoldEmpty) {
+                    return const Center(
+                      child: Text('Tidak ada produk yang dijual.'),
+                    );
+                  }
+
+                  if (state is ProductSoldError) {
+                    return Center(child: Text('Error: ${state.message}'));
+                  }
+
+                  if (state is ProductSoldLoaded) {
+                    final products = state.products
+                        .cast<ProductEntityResponse>();
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 0.9,
+                          ),
+                      itemCount: products.length,
+                      itemBuilder: (context, index) {
+                        final p = products[index];
+                        return ProductSoldItem(product: p);
+                      },
+                    );
+                  }
+
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 }
 
 class ProductSoldItem extends StatelessWidget {
+  final String formattedPrice;
+
   final ProductEntityResponse product;
-  const ProductSoldItem({super.key, required this.product});
+  ProductSoldItem({super.key, required this.product})
+    : formattedPrice = NumberFormat('#,###', 'id_ID').format(product.price);
 
   @override
   Widget build(BuildContext context) {
@@ -107,9 +131,7 @@ class ProductSoldItem extends StatelessWidget {
       color: Colors.transparent, // transparan, tanpa background
       elevation: 0, // hilangin bayangan
       shadowColor: Colors.transparent, // biar gak ada efek shadow
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -167,15 +189,16 @@ class ProductSoldItem extends StatelessWidget {
           Text(
             product.name,
             maxLines: 2,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 2),
           Text(
-            'Rp ${product.price}',
+            'Rp.$formattedPrice',
             style: const TextStyle(
-              fontSize: 13,
+              fontSize: 14,
               color: Colors.grey,
-              fontWeight: FontWeight.w300,
+              fontWeight: FontWeight.w400,
+              height: 1.2,
             ),
           ),
           const SizedBox(height: 8),
@@ -183,7 +206,9 @@ class ProductSoldItem extends StatelessWidget {
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('${product.name} telah ditambahkan ke keranjang'),
+                  content: Text(
+                    '${product.name} telah ditambahkan ke keranjang',
+                  ),
                   duration: Duration(seconds: 2),
                 ),
               );

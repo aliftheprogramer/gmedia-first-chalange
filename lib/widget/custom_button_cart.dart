@@ -26,7 +26,7 @@ class CustomButtonCart extends StatelessWidget {
           backgroundColor: const Color(0xFF3D5AFE),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(8.0),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           textStyle: const TextStyle(

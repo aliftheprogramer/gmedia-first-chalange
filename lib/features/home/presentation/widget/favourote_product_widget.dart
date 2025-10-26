@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/favorite/favorite_product_cubit.dart';
@@ -10,6 +11,7 @@ import 'package:gmedia_project/features/product/domain/usecase/get_list_product_
 
 class FavouroteProductWidget extends StatelessWidget {
   const FavouroteProductWidget({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
@@ -73,9 +75,11 @@ class FavouroteProductWidget extends StatelessWidget {
 }
 
 class _FavoriteProductItem extends StatelessWidget {
+  final String formattedPrice;
+
   final ProductEntityResponse product;
 
-  const _FavoriteProductItem({required this.product});
+   _FavoriteProductItem({required this.product}) : formattedPrice = NumberFormat('#,###', 'id_ID').format(product.price);
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +94,7 @@ class _FavoriteProductItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
               child: SizedBox(
               width: double.infinity,
-              height: 120,
+              height: 140,
               child: Builder(builder: (context) {
                 if (product.pictureUrl.isEmpty) {
                   return Container(
@@ -139,13 +143,14 @@ class _FavoriteProductItem extends StatelessWidget {
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 6),
+          
           Text(
-            'Rp. ${product.price}',
+            'Rp.$formattedPrice',
             style: const TextStyle(
               fontSize: 14,
               color: Colors.grey,
-              fontWeight: FontWeight.w300,
-              height: 1.2, // 120% line height
+              fontWeight: FontWeight.w400,
+              height: 1.2, 
             ),
           ),
 
