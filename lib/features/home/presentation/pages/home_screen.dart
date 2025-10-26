@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/home/presentation/provider/home_provider.dart';
 import 'package:gmedia_project/features/home/presentation/widget/custom_search_bar.dart';
-import 'package:gmedia_project/features/home/presentation/widget/favourote_product_widget.dart';
-import 'package:gmedia_project/features/home/presentation/widget/hero_section_widget.dart';
-import 'package:gmedia_project/features/home/presentation/widget/home_app_bar.dart';
-import 'package:gmedia_project/features/home/presentation/widget/product_sold_widget.dart';
+import 'package:gmedia_project/features/home/presentation/widget/home/favourote_product_widget.dart';
+import 'package:gmedia_project/features/home/presentation/widget/home/hero_section_widget.dart';
+import 'package:gmedia_project/features/home/presentation/widget/home/home_app_bar.dart';
+import 'package:gmedia_project/features/home/presentation/widget/home/product_sell_widget.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              const ProductSoldWidget(),
+              const ProductSellWidget(),
             ],
           ),
         ),

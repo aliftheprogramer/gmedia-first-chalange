@@ -1,18 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/core/resources/data_state.dart';
-import 'package:gmedia_project/features/home/presentation/cubit/product_sold/product_sold_state.dart';
+import 'package:gmedia_project/features/home/presentation/cubit/product_sold/product_sell_state.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
 import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
 import 'package:gmedia_project/features/product/domain/usecase/param/search_product_query.dart';
 
-class ProductSoldCubit extends Cubit<ProductSoldState>{
+class ProductSellCubit extends Cubit<ProductSellState>{
   final GetListProductUsecase _getListProductUsecase;
   List<ProductEntityResponse> _items = [];
-  ProductSoldCubit(this._getListProductUsecase) : super(const ProductSoldInitial());
+  ProductSellCubit(this._getListProductUsecase) : super(const ProductSellInitial());
 
   Future<void> fetchSoldProducts() async {
     try {
-      emit(const ProductSoldLoading());
+      emit(const ProductSellLoading());
       final DataState<List<ProductEntityResponse>> res =
           await _getListProductUsecase.call(param: const GetListProductParams());
 
@@ -20,17 +20,17 @@ class ProductSoldCubit extends Cubit<ProductSoldState>{
         final list = res.data!;
         _items = list.take(4).toList();
         if (_items.isEmpty) {
-          emit(const ProductSoldEmpty());
+          emit(const ProductSellEmpty());
         } else {
-          emit(ProductSoldLoaded(_items));
+          emit(ProductSellLoaded(_items));
         }
       } else if (res is DataFailed) {
-        emit(ProductSoldError(res.error?.message ?? 'Failed to load sold products'));
+        emit(ProductSellError(res.error?.message ?? 'Failed to load sold products'));
       } else {
-        emit(const ProductSoldEmpty());
+        emit(const ProductSellEmpty());
       }
     } catch (e) {
-      emit(ProductSoldError(e.toString()));
+      emit(ProductSellError(e.toString()));
     }
   }
 }
