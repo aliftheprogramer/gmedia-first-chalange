@@ -80,15 +80,17 @@ class _FavoriteProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 140,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      width: 160,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
               child: SizedBox(
-              width: 140,
-              height: 140,
+              width: double.infinity,
+              height: 120,
               child: Builder(builder: (context) {
                 if (product.pictureUrl.isEmpty) {
                   return Container(
@@ -129,21 +131,28 @@ class _FavoriteProductItem extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
+          
           Text(
             product.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 6),
           Text(
-            'Rp ${product.price}',
-            style: const TextStyle(fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w300),
+            'Rp. ${product.price}',
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.grey,
+              fontWeight: FontWeight.w300,
+              height: 1.2, // 120% line height
+            ),
           ),
 
-
+        
         ],
       ),
-    );
+    ),
+  );
   }
 }

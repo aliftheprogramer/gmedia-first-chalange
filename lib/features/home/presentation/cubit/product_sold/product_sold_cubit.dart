@@ -18,7 +18,7 @@ class ProductSoldCubit extends Cubit<ProductSoldState>{
 
       if (res is DataSuccess && res.data != null) {
         final list = res.data!;
-        _items = list.take(10).toList();
+        _items = list.take(4).toList();
         if (_items.isEmpty) {
           emit(const ProductSoldEmpty());
         } else {

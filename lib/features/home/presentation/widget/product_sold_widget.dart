@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/product_sold/product_sold_cubit.dart';
+import 'package:gmedia_project/features/home/presentation/cubit/product_sold/product_sold_state.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
 import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
 import 'package:gmedia_project/widget/custom_button_cart.dart';
@@ -51,10 +52,44 @@ class ProductSoldWidget extends StatelessWidget {
               ),
             ],
           ) ,),
-          const SizedBox(height: 12,)
-          SizedBox(
-            height: 260,
-            child: BlocBuilder(builder: builder),
+          const SizedBox(height: 12,),
+          // Use a grid with 2 columns; let parent ListView scroll (so grid is shrinkWrapped)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: BlocBuilder<ProductSoldCubit, ProductSoldState>(builder: (context, state){
+              if (state is ProductSoldLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (state is ProductSoldEmpty) {
+                return const Center(child: Text('Tidak ada produk yang dijual.'));
+              }
+
+              if (state is ProductSoldError) {
+                return Center(child: Text('Error: ${state.message}'));
+              }
+
+              if (state is ProductSoldLoaded) {
+                final products = state.products.cast<ProductEntityResponse>();
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.9,
+                  ),
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    final p = products[index];
+                    return ProductSoldItem(product: p);
+                  },
+                );
+              }
+
+              return const SizedBox.shrink();
+            }),
           )
         ],
       ),
@@ -69,80 +104,91 @@ class ProductSoldItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.transparent, // transparan, tanpa background
+      elevation: 0, // hilangin bayangan
+      shadowColor: Colors.transparent, // biar gak ada efek shadow
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            child: Builder(
-              builder: (context) {
-                if (product.pictureUrl.isEmpty) {
-                  return Container(
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: Icon(Icons.image, color: Colors.grey),
-                    ),
-                  );
-                }
-
-                String imageUrl = product.pictureUrl.trim();
-                if (imageUrl.startsWith('http://')) {
-                  imageUrl = imageUrl.replaceFirst('http://', 'https://');
-                }
-
-                final logger = sl<Logger>();
-
-                return CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) {
-                    try {
-                      logger.e('Failed loading product image');
-                    } catch (_) {
-                      logger.e('Image load error: $url -> $error');
-                    }
+            borderRadius: BorderRadius.circular(8),
+            child: SizedBox(
+              height: 140,
+              width: double.infinity,
+              child: Builder(
+                builder: (context) {
+                  if (product.pictureUrl.isEmpty) {
                     return Container(
                       color: Colors.grey[200],
                       child: const Center(
-                        child: Icon(Icons.broken_image, color: Colors.grey),
+                        child: Icon(Icons.image, color: Colors.grey),
                       ),
                     );
-                  },
-                );
-              },
+                  }
+
+                  String imageUrl = product.pictureUrl.trim();
+                  if (imageUrl.startsWith('http://')) {
+                    imageUrl = imageUrl.replaceFirst('http://', 'https://');
+                  }
+
+                  final logger = sl<Logger>();
+
+                  return CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) {
+                      try {
+                        logger.e('Failed loading product image');
+                      } catch (_) {
+                        logger.e('Image load error: $url -> $error');
+                      }
+                      return Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: Icon(Icons.broken_image, color: Colors.grey),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ),
-          SizedBox(),
+          const SizedBox(height: 8),
           Text(
             product.name,
             maxLines: 2,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
           ),
-          const SizedBox(height: 1),
+          const SizedBox(height: 2),
           Text(
             'Rp ${product.price}',
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               color: Colors.grey,
               fontWeight: FontWeight.w300,
             ),
           ),
+          const SizedBox(height: 8),
           CustomButtonCart(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(
-                    '${product.name} telah ditambahkan ke keranjang',
-                  ),
+                  content: Text('${product.name} telah ditambahkan ke keranjang'),
                   duration: Duration(seconds: 2),
                 ),
               );
             },
+            width: double.infinity,
           ),
         ],
       ),

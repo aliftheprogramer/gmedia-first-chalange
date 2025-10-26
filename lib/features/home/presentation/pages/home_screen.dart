@@ -7,6 +7,7 @@ import 'package:gmedia_project/features/home/presentation/widget/custom_search_b
 import 'package:gmedia_project/features/home/presentation/widget/favourote_product_widget.dart';
 import 'package:gmedia_project/features/home/presentation/widget/hero_section_widget.dart';
 import 'package:gmedia_project/features/home/presentation/widget/home_app_bar.dart';
+import 'package:gmedia_project/features/home/presentation/widget/product_sold_widget.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +54,7 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              
+              const ProductSoldWidget(),
             ],
           ),
         ),
