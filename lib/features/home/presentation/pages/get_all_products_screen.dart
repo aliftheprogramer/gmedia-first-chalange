@@ -8,7 +8,12 @@ class GetAllProductsScreen extends StatelessWidget {
   @override     
   Widget build(BuildContext context) {
     final logger = sl<Logger>();
-    return const SafeArea(child: 
+    return const SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: Text('Get All Products Screen'),
+        ),
+      ),
     );
   }
 }
