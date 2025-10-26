@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/core/resources/data_state.dart';
-import 'package:gmedia_project/features/home/presentation/cubit/product_sold/product_sell_state.dart';
+import 'package:gmedia_project/features/home/presentation/cubit/product_sell/product_sell_state.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
 import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
 import 'package:gmedia_project/features/product/domain/usecase/param/search_product_query.dart';
