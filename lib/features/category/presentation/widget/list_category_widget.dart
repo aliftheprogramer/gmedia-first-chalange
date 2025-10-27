@@ -100,10 +100,18 @@ class _CategoryListView extends StatelessWidget {
               primary: false,
               shrinkWrap: true,
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              itemCount: categories.length,
+              itemCount: categories.length + 1,
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
-                final category = categories[index];
+                if (index == 0) {
+                  final bool isSelected = selectedId == null;
+                  return _AllCategoryItem(
+                    selected: isSelected,
+                    onTap: cubit == null ? null : () => cubit.clearSelection(),
+                  );
+                }
+
+                final category = categories[index - 1];
                 final isSelected = selectedId != null && category.id == selectedId;
 
                 return CategoryItemWidget(
@@ -156,6 +164,47 @@ class CategoryItemWidget extends StatelessWidget {
         ),
         child: Text(
           category.name,
+          style: TextStyle(
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+            color: selected
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).textTheme.bodyMedium?.color,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class _AllCategoryItem extends StatelessWidget {
+  final bool selected;
+  final VoidCallback? onTap;
+
+  const _AllCategoryItem({this.selected = false, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(20);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: radius,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: radius,
+          border: Border.all(
+            color: selected
+                ? Theme.of(context).colorScheme.primary
+                : Colors.grey.shade300,
+          ),
+          color: selected
+              ? Theme.of(context).colorScheme.primary.withOpacity(0.10)
+              : Colors.transparent,
+        ),
+        child: Text(
+          'Semua Menu',
           style: TextStyle(
             fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
             color: selected

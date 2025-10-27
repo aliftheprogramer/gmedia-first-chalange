@@ -21,6 +21,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: false,
       elevation: 0,
       backgroundColor: const Color(0xFFEBF0FD),
       systemOverlayStyle: const SystemUiOverlayStyle(
