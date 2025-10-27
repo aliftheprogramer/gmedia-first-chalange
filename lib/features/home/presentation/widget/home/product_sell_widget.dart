@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/product_sell/product_sell_cubit.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/product_sell/product_sell_state.dart';
+import 'package:gmedia_project/features/home/presentation/pages/get_all_products_screen.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
 import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
 import 'package:gmedia_project/widget/custom_button_cart.dart';
@@ -37,6 +38,11 @@ class ProductSellWidget extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const GetAllProductsScreen(),
+                        ),
+                      );
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Menampilkan semua produk'),

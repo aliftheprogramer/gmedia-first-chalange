@@ -11,6 +11,11 @@ import 'package:gmedia_project/features/auth/domain/usecase/is_logged_in.dart';
 import 'package:gmedia_project/features/auth/domain/usecase/signin_usecases.dart';
 import 'package:gmedia_project/features/auth/presentation/cubit/login/login_cubit.dart';
 import 'package:gmedia_project/features/auth/presentation/cubit/visible/password_visible_state.dart';
+import 'package:gmedia_project/features/category/data/repository_impl/category_repository_impl.dart';
+import 'package:gmedia_project/features/category/data/source/category_api_service.dart';
+import 'package:gmedia_project/features/category/domain/repository/category_repository.dart';
+import 'package:gmedia_project/features/category/domain/usecase/create_new_category_usecase.dart';
+import 'package:gmedia_project/features/category/domain/usecase/get_all_category_usecase.dart';
 import 'package:gmedia_project/features/home/data/repository_impl/home_repository_impl.dart';
 import 'package:gmedia_project/features/home/data/source/home_local_data_source.dart';
 import 'package:gmedia_project/features/home/domain/repository/home_repository.dart';
@@ -52,6 +57,7 @@ Future<void> setUpServiceLocator() async {
   sl.registerLazySingleton<HomeLocalDataSource>(
     () => HomeLocalDataSourceImpl(),
   );
+  sl.registerLazySingleton<CategoryApiService>(() => CategoryApiServiceImpl());
 
   // Repositories
   sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl());
@@ -60,6 +66,7 @@ Future<void> setUpServiceLocator() async {
   );
   sl.registerLazySingleton<ProductRepository>(() => ProductRepositoryImpl());
   sl.registerLazySingleton<HomeRepository>(() => HomeRepositoryImpl(sl()));
+  sl.registerLazySingleton<CategoryRepository>(() => CategoryRepositoryImpl());
 
   // Use Cases
   sl.registerLazySingleton(() => IsLoggedInUseCase(sl()));
@@ -71,7 +78,11 @@ Future<void> setUpServiceLocator() async {
   sl.registerLazySingleton(() => GetProductDetail(sl()));
   sl.registerLazySingleton(() => GetListProductUsecase(sl()));
   sl.registerLazySingleton(() => GetHeroBannersUseCase(sl()));
-  sl.registerLazySingleton(() => EditProductUsecase(sl())); // <-- DITAMBAHKAN: Registrasi EditProductUsecase
+  sl.registerLazySingleton(() => EditProductUsecase(sl()));
+  sl.registerLazySingleton(() => CreateNewCategoryUsecase(sl()));
+  sl.registerLazySingleton(() => GetAllCategoryUsecase(sl()));
+
+
 
   // Cubits & Providers
   sl.registerFactory(() => PasswordVisibleCubit());
