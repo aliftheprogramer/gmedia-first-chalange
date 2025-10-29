@@ -36,7 +36,7 @@ class GetAllProductsScreen extends StatelessWidget {
               const ListCategoryWidget(),
               const SizedBox(height: 12),
                   
-              // 3) Area konten produk (scroll vertikal)
+
               Expanded(
                 child: _ProductsPlaceholder(), // Ganti dengan grid/list produk kamu
               ),

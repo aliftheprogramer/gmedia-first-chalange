@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:logger/logger.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/category/domain/entity/entity_response_category.dart';
 import 'package:gmedia_project/features/category/presentation/cubit/category_cubit.dart';
+import 'package:gmedia_project/features/category/presentation/cubit/category_list_cubit.dart';
 import 'package:gmedia_project/features/category/presentation/cubit/category_state.dart';
 import 'package:gmedia_project/features/category/domain/usecase/get_all_category_usecase.dart';
 
@@ -33,13 +35,12 @@ class ListCategoryWidget extends StatelessWidget {
             logger.d('CategoryState changed: $state');
             if (state is CategoryIsClicked) {
               logger.i('Selected category -> id: ${state.categoryId}, name: ${state.categoryName}');
-              // Bisa trigger filter produk di sini
             }
           },
           child: BlocBuilder<CategoryCubit, CategoryState>(
             builder: (context, state) {
               if (state is CategoryLoading) {
-                return const SizedBox(height: 56, child: Center(child: Text('Loading...')));
+                return const SizedBox(height: 32, child: Center(child: Text('Loading...')));
               }
 
               if (state is CategoryLoaded) {
@@ -57,10 +58,10 @@ class ListCategoryWidget extends StatelessWidget {
               }
 
               if (state is CategoryError) {
-                return SizedBox(height: 56, child: Center(child: Text('Error: ${state.message}')));
+                return SizedBox(height: 32, child: Center(child: Text('Error: ${state.message}')));
               }
 
-              return const SizedBox(height: 56);
+              return const SizedBox(height: 32);
             },
           ),
         ),
@@ -69,7 +70,7 @@ class ListCategoryWidget extends StatelessWidget {
       try {
         sl<Logger>().e('Failed to initialize Category widget: $e\n$st');
       } catch (_) {}
-      return const SizedBox(height: 56);
+      return const SizedBox(height: 32);
     }
   }
 }
@@ -82,23 +83,33 @@ class _CategoryListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Provide a local cubit that owns the ScrollController and scroll behaviour.
+    return BlocProvider(
+      create: (_) => CategoryListCubit(),
+      child: _CategoryListViewContent(categories: categories, selectedId: selectedId),
+    );
+  }
+}
+
+class _CategoryListViewContent extends StatelessWidget {
+  final List<CategoryEntityResponse> categories;
+  final String? selectedId;
+
+  const _CategoryListViewContent({required this.categories, required this.selectedId});
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<CategoryCubit?>();
+    final listCubit = context.read<CategoryListCubit>();
+
     return SizedBox(
-      height: 56,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final double width = constraints.hasBoundedWidth
-              ? constraints.maxWidth
-              : MediaQuery.of(context).size.width;
-
-          // Akses cubit dari context (lebih aman & kompatibel)
-          final cubit = context.read<CategoryCubit?>();
-
-          return SizedBox(
-            width: width,
+      height: 36,
+      child: Row(
+        children: [
+          Expanded(
             child: ListView.separated(
+              controller: listCubit.controller,
               scrollDirection: Axis.horizontal,
-              primary: false,
-              shrinkWrap: true,
               padding: const EdgeInsets.symmetric(horizontal: 8),
               itemCount: categories.length + 1,
               separatorBuilder: (_, __) => const SizedBox(width: 8),
@@ -117,14 +128,29 @@ class _CategoryListView extends StatelessWidget {
                 return CategoryItemWidget(
                   category: category,
                   selected: isSelected,
-                  onTap: cubit == null
-                      ? null
-                      : () => cubit.selectCategory(category),
+                  onTap: cubit == null ? null : () => cubit.selectCategory(category),
                 );
               },
             ),
-          );
-        },
+          ),
+
+          // Tombol '>'
+          InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () => listCubit.scrollRight(),
+            child: Container(
+              width: 28,
+              height: 28,
+              margin: const EdgeInsets.only(right: 8),
+              alignment: Alignment.center,
+              child: const Icon(
+                Icons.arrow_forward_ios,
+                size: 14,
+                color: Color(0xFF1843C3),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -144,38 +170,32 @@ class CategoryItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(20);
+    final backgroundColor = selected ? const Color(0xFFD6DFFA) : Colors.transparent;
+    final textColor = selected ? const Color(0xFF1843C3) : const Color(0xFF7A7A7A);
 
     return InkWell(
       onTap: onTap,
-      borderRadius: radius,
+      borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          borderRadius: radius,
-          border: Border.all(
-            color: selected
-                ? Theme.of(context).colorScheme.primary
-                : Colors.grey.shade300,
-          ),
-          color: selected
-              ? Theme.of(context).colorScheme.primary.withOpacity(0.10)
-              : Colors.transparent,
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           category.name,
+          textAlign: TextAlign.center,
           style: TextStyle(
-            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-            color: selected
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).textTheme.bodyMedium?.color,
+            color: textColor,
+            fontSize: 14,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
           ),
         ),
       ),
     );
   }
 }
-
 
 class _AllCategoryItem extends StatelessWidget {
   final bool selected;
@@ -185,31 +205,26 @@ class _AllCategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(20);
+    final backgroundColor = selected ? const Color(0xFFD6DFFA) : Colors.transparent;
+    final textColor = selected ? const Color(0xFF1843C3) : const Color(0xFF7A7A7A);
 
     return InkWell(
       onTap: onTap,
-      borderRadius: radius,
+      borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          borderRadius: radius,
-          border: Border.all(
-            color: selected
-                ? Theme.of(context).colorScheme.primary
-                : Colors.grey.shade300,
-          ),
-          color: selected
-              ? Theme.of(context).colorScheme.primary.withOpacity(0.10)
-              : Colors.transparent,
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           'Semua Menu',
+          textAlign: TextAlign.center,
           style: TextStyle(
-            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-            color: selected
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).textTheme.bodyMedium?.color,
+            color: textColor,
+            fontSize: 14,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
           ),
         ),
       ),
