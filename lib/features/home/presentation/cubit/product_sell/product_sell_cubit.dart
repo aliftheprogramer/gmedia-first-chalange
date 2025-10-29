@@ -33,4 +33,27 @@ class ProductSellCubit extends Cubit<ProductSellState>{
       emit(ProductSellError(e.toString()));
     }
   }
+    Future<void> fetchSoldProductsAll() async {
+    try {
+      emit(const ProductSellLoading());
+      final DataState<List<ProductEntityResponse>> res =
+          await _getListProductUsecase.call(param: const GetListProductParams());
+
+      if (res is DataSuccess && res.data != null) {
+        final list = res.data!;
+        _items = list.toList();
+        if (_items.isEmpty) {
+          emit(const ProductSellEmpty());
+        } else {
+          emit(ProductSellLoaded(_items));
+        }
+      } else if (res is DataFailed) {
+        emit(ProductSellError(res.error?.message ?? 'Failed to load sold products'));
+      } else {
+        emit(const ProductSellEmpty());
+      }
+    } catch (e) {
+      emit(ProductSellError(e.toString()));
+    }
+  }
 }

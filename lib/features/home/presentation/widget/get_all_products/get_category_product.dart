@@ -15,7 +15,7 @@ class ProductsPlaceholder extends StatelessWidget {
     return BlocProvider(
       create: (_){
         final cubit = ProductSellCubit(sl <GetListProductUsecase>());
-        cubit.fetchSoldProducts();
+        cubit.fetchSoldProductsAll();
         return cubit;
       },
       child: BlocBuilder<ProductSellCubit, ProductSellState>(
@@ -34,20 +34,22 @@ class ProductsPlaceholder extends StatelessWidget {
       
           if (state is ProductSellLoaded) {
             final products = state.products.cast<ProductEntityResponse>();
-            return GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.9,
+            return SingleChildScrollView(
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.9,
+                ),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final p = products[index];
+                  return ProductSellItem(product: p);
+                },
               ),
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final p = products[index];
-                return ProductSellItem(product: p);
-              },
             );
           }
       
