@@ -27,12 +27,19 @@ class GetAllProductsScreen extends StatelessWidget {
               return cubit;
             },
             child: Scaffold(
-              // Allow bottomNavigationBar (with its curved/raised center) to paint over the body
               extendBody: true,
 
               bottomNavigationBar: CustomBottomNavigator(
                 currentIndex: state,
-                onTap: (index) => context.read<NavigationCubit>().updateIndex(index),
+                onTap: (index) {
+                  // Update the selected tab in the global NavigationCubit
+                  if (index != state) {
+                    context.read<NavigationCubit>().updateIndex(index);
+                  }
+                  // Since this screen is pushed on top of MainScreen,
+                  // pop back to the root so the MainScreen body updates.
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
               ),
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
