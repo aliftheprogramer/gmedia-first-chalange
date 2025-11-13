@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
+import 'package:gmedia_project/features/category/presentation/cubit/category_cubit.dart';
+import 'package:gmedia_project/features/category/presentation/cubit/category_state.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/product_sell/product_sell_cubit.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/product_sell/product_sell_state.dart';
 import 'package:gmedia_project/features/home/presentation/widget/home/product_sell_widget.dart';
@@ -18,8 +20,18 @@ class ProductsPlaceholder extends StatelessWidget {
         cubit.fetchSoldProductsAll();
         return cubit;
       },
-      child: BlocBuilder<ProductSellCubit, ProductSellState>(
-        builder: (context, state) {
+      child: BlocListener<CategoryCubit, CategoryState>(
+        listener: (context, catState) {
+          final productCubit = context.read<ProductSellCubit>();
+          if (catState is CategoryIsClicked) {
+            productCubit.fetchByCategory(catState.categoryId);
+          } else if (catState is CategoryLoaded && catState.selectedId == null) {
+            // No category selected -> show all
+            productCubit.fetchByCategory(null);
+          }
+        },
+        child: BlocBuilder<ProductSellCubit, ProductSellState>(
+          builder: (context, state) {
           late final Widget content;
 
           if (state is ProductSellLoading) {
@@ -57,7 +69,8 @@ class ProductsPlaceholder extends StatelessWidget {
             child: content,
 
           );
-        },
+          },
+        ),
       ),
     );
   }

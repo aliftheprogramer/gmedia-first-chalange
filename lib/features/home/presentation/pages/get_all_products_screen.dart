@@ -8,6 +8,9 @@ import 'package:gmedia_project/features/home/presentation/widget/get_all_product
 import 'package:gmedia_project/features/home/presentation/widget/home/home_app_bar.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 import 'package:gmedia_project/widget/custom_bottom_navigator.dart';
+import 'package:gmedia_project/core/services/services_locator.dart';
+import 'package:gmedia_project/features/category/presentation/cubit/category_cubit.dart';
+import 'package:gmedia_project/features/category/domain/usecase/get_all_category_usecase.dart';
 
 class GetAllProductsScreen extends StatelessWidget {
   const GetAllProductsScreen({super.key});
@@ -15,38 +18,42 @@ class GetAllProductsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      
       child: BlocBuilder<NavigationCubit, int>(
         builder: (context, state) {
-          return Scaffold(
+          return BlocProvider(
+            create: (_) {
+              final cubit = CategoryCubit(sl<GetAllCategoryUsecase>());
+              cubit.fetchCategories();
+              return cubit;
+            },
+            child: Scaffold(
 
-            bottomNavigationBar: CustomBottomNavigator(
+              bottomNavigationBar: CustomBottomNavigator(
                 currentIndex: state,
                 onTap: (index) => context.read<NavigationCubit>().updateIndex(index),
-          ),
-        
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const HomeAppBar(),
-              const SizedBox(height: 24),
-              // 1) SEARCH di paling atas
-              const SearchBarWidget(),
-              const SizedBox(height: 12),
-                  
-              // 2) NAV kategori (horizontal) tepat di bawah search
-              const ListCategoryWidget(),
-              const SizedBox(height: 12),
-                  
-
-              Expanded(
-                child: ProductsPlaceholder(), // Ganti dengan grid/list produk kamu
               ),
-            ],
-          ),
-        );
-      },
-      )
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const HomeAppBar(),
+                  const SizedBox(height: 24),
+                  // 1) SEARCH di paling atas
+                  const SearchBarWidget(),
+                  const SizedBox(height: 12),
+
+                  // 2) NAV kategori (horizontal) tepat di bawah search
+                  const ListCategoryWidget(),
+                  const SizedBox(height: 12),
+
+                  const Expanded(
+                    child: ProductsPlaceholder(),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
     
   }

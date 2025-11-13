@@ -56,4 +56,32 @@ class ProductSellCubit extends Cubit<ProductSellState>{
       emit(ProductSellError(e.toString()));
     }
   }
+  
+  /// Fetch products filtered by a specific category. If [categoryId] is null,
+  /// fetch all products.
+  Future<void> fetchByCategory(String? categoryId) async {
+    try {
+      emit(const ProductSellLoading());
+      final DataState<List<ProductEntityResponse>> res =
+          await _getListProductUsecase.call(
+        param: GetListProductParams(categoryId: categoryId),
+      );
+
+      if (res is DataSuccess && res.data != null) {
+        final list = res.data!;
+        _items = list.toList();
+        if (_items.isEmpty) {
+          emit(const ProductSellEmpty());
+        } else {
+          emit(ProductSellLoaded(_items));
+        }
+      } else if (res is DataFailed) {
+        emit(ProductSellError(res.error?.message ?? 'Failed to load products'));
+      } else {
+        emit(const ProductSellEmpty());
+      }
+    } catch (e) {
+      emit(ProductSellError(e.toString()));
+    }
+  }
 }

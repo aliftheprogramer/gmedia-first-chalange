@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:logger/logger.dart';
-import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/category/domain/entity/entity_response_category.dart';
 import 'package:gmedia_project/features/category/presentation/cubit/category_cubit.dart';
 import 'package:gmedia_project/features/category/presentation/cubit/category_list_cubit.dart';
 import 'package:gmedia_project/features/category/presentation/cubit/category_state.dart';
-import 'package:gmedia_project/features/category/domain/usecase/get_all_category_usecase.dart';
 
 class ListCategoryWidget extends StatelessWidget {
   final List<CategoryEntityResponse>? categories;
@@ -20,58 +17,34 @@ class ListCategoryWidget extends StatelessWidget {
       return _CategoryListView(categories: categories!, selectedId: null);
     }
 
-    try {
-      final logger = sl<Logger>();
-      return BlocProvider(
-        create: (_) {
-          logger.i('Creating CategoryCubit and fetching categories');
-          final cubit = CategoryCubit(sl<GetAllCategoryUsecase>());
-          cubit.fetchCategories();
-          return cubit;
-        },
-        child: BlocListener<CategoryCubit, CategoryState>(
-          listener: (context, state) {
-            final logger = sl<Logger>();
-            logger.d('CategoryState changed: $state');
-            if (state is CategoryIsClicked) {
-              logger.i('Selected category -> id: ${state.categoryId}, name: ${state.categoryName}');
-            }
-          },
-          child: BlocBuilder<CategoryCubit, CategoryState>(
-            builder: (context, state) {
-              if (state is CategoryLoading) {
-                return const SizedBox(height: 32, child: Center(child: Text('Loading...')));
-              }
+    // Expect a CategoryCubit to be provided by an ancestor (e.g., the screen).
+    return BlocBuilder<CategoryCubit, CategoryState>(
+      builder: (context, state) {
+        if (state is CategoryLoading) {
+          return const SizedBox(height: 32, child: Center(child: Text('Loading...')));
+        }
 
-              if (state is CategoryLoaded) {
-                return _CategoryListView(
-                  categories: state.categories,
-                  selectedId: state.selectedId,
-                );
-              }
+        if (state is CategoryLoaded) {
+          return _CategoryListView(
+            categories: state.categories,
+            selectedId: state.selectedId,
+          );
+        }
 
-              if (state is CategoryIsClicked) {
-                return _CategoryListView(
-                  categories: state.categories,
-                  selectedId: state.categoryId,
-                );
-              }
+        if (state is CategoryIsClicked) {
+          return _CategoryListView(
+            categories: state.categories,
+            selectedId: state.categoryId,
+          );
+        }
 
-              if (state is CategoryError) {
-                return SizedBox(height: 32, child: Center(child: Text('Error: ${state.message}')));
-              }
+        if (state is CategoryError) {
+          return SizedBox(height: 32, child: Center(child: Text('Error: ${state.message}')));
+        }
 
-              return const SizedBox(height: 32);
-            },
-          ),
-        ),
-      );
-    } catch (e, st) {
-      try {
-        sl<Logger>().e('Failed to initialize Category widget: $e\n$st');
-      } catch (_) {}
-      return const SizedBox(height: 32);
-    }
+        return const SizedBox(height: 32);
+      },
+    );
   }
 }
 
