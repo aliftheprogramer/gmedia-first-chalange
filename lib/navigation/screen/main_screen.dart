@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/features/home/presentation/pages/home_screen.dart';
 import 'package:gmedia_project/features/product/presentation/page/add_product_screen.dart';
+import 'package:gmedia_project/features/category/presentation/page/add_category_screen.dart';
 
 import 'package:gmedia_project/features/profile/presentation/page/profile_screen.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
@@ -47,10 +48,9 @@ class MainScreen extends StatelessWidget {
                       );
                     },
                     onKategoriTap: () {
-                      // TODO: push halaman tambah kategori jika sudah tersedia
                       Navigator.of(ctx).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Tambah kategori belum diimplementasi')),
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const AddCategoryScreen()),
                       );
                     },
                   );
