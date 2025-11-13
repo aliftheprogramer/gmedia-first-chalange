@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
             if (state is FirstRun) {
               return const WelcomePage();
             } else if (state is Authenticated) {
-              return const MainScreen();
+              return MainScreen();
             } else if (state is UnAuthenticated) {
               return const LoginPage();
             } else {

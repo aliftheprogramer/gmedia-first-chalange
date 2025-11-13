@@ -37,6 +37,7 @@ import 'package:gmedia_project/features/welcome/domain/usecase/set_first_run_com
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 import 'package:logger/logger.dart'; // <-- Ditambahkan
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gmedia_project/features/product/presentation/cubit/add_product_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -90,4 +91,5 @@ Future<void> setUpServiceLocator() async {
   sl.registerFactory(() => NavigationCubit());
   sl.registerFactory(() => AuthStateCubit());
   sl.registerFactory(() => HomeProvider(sl()));
+  sl.registerFactory(() => AddProductCubit(sl()));
 }

@@ -6,10 +6,12 @@ class CustomBottomNavigator extends StatelessWidget {
 		super.key,
 		required this.currentIndex,
 		required this.onTap,
+		this.onCenterTap,
 	});
 
 	final int currentIndex;
 	final ValueChanged<int> onTap;
+	final VoidCallback? onCenterTap;
 
 	@override
 	Widget build(BuildContext context) {
@@ -19,7 +21,14 @@ class CustomBottomNavigator extends StatelessWidget {
 			children: [
 				BottomNavigationBar(
 					currentIndex: currentIndex,
-					onTap: onTap,
+					onTap: (index) {
+						if (index == 1) {
+							// Trigger center action as overlay instead of navigating to a page
+							onCenterTap?.call();
+							return;
+						}
+						onTap(index);
+					},
 					items: const [
 						BottomNavigationBarItem(
 							icon: Icon(LucideIcons.home, size: 26),
@@ -64,7 +73,13 @@ class CustomBottomNavigator extends StatelessWidget {
 									color: Colors.white,
 									size: 28,
 								),
-								onPressed: () => onTap(1),
+								onPressed: () {
+									if (onCenterTap != null) {
+										onCenterTap!();
+									} else {
+										onTap(1);
+									}
+								},
 							),
 						),
 					),
