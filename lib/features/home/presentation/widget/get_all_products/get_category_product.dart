@@ -20,21 +20,17 @@ class ProductsPlaceholder extends StatelessWidget {
       },
       child: BlocBuilder<ProductSellCubit, ProductSellState>(
         builder: (context, state) {
+          late final Widget content;
+
           if (state is ProductSellLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-      
-          if (state is ProductSellEmpty) {
-            return const Center(child: Text('Tidak ada produk yang dijual.'));
-          }
-      
-          if (state is ProductSellError) {
-            return Center(child: Text('Error: ${state.message}'));
-          }
-      
-          if (state is ProductSellLoaded) {
+            content = const Center(child: CircularProgressIndicator());
+          } else if (state is ProductSellEmpty) {
+            content = const Center(child: Text('Tidak ada produk yang dijual.'));
+          } else if (state is ProductSellError) {
+            content = Center(child: Text('Error: ${state.message}'));
+          } else if (state is ProductSellLoaded) {
             final products = state.products.cast<ProductEntityResponse>();
-            return SingleChildScrollView(
+            content = SingleChildScrollView(
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -51,9 +47,16 @@ class ProductsPlaceholder extends StatelessWidget {
                 },
               ),
             );
+          } else {
+            content = const SizedBox.shrink();
           }
-      
-          return const SizedBox.shrink();
+
+          return Container(
+            color: Colors.white,
+            padding: const EdgeInsets.all(16),
+            child: content,
+
+          );
         },
       ),
     );

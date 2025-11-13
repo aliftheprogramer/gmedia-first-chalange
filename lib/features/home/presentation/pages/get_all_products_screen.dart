@@ -15,6 +15,7 @@ class GetAllProductsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      
       child: BlocBuilder<NavigationCubit, int>(
         builder: (context, state) {
           return Scaffold(

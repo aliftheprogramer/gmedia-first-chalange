@@ -23,9 +23,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
-      backgroundColor: const Color(0xFFEBF0FD),
+      backgroundColor: Colors.transparent,
       systemOverlayStyle: const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFFEBF0FD),
+        statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.light,
       ),
@@ -51,7 +51,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: InkWell(
             onTap: onProfileTap,
             customBorder: const CircleBorder(),
-            child: CircleAvatar(
+              child: CircleAvatar(
               radius: 18,
               backgroundColor: Color(0xFFEBF0FD),
               child: ClipOval(

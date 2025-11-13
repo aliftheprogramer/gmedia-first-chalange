@@ -16,6 +16,8 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bgHeight = MediaQuery.of(context).size.height * 0.4;
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => sl<LoginCubit>()),
@@ -39,13 +41,25 @@ class LoginPage extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
+                  // Background stays at the top
                   const Positioned(
                     top: 0,
                     left: 0,
                     right: 0,
                     child: LoginBackground(),
                   ),
-                  const LoginFormCard(),
+
+                  // Position the form card to occupy the bottom area and
+                  // ensure the lower portion is white. We set `top` to
+                  // slightly overlap the background so the rounded top
+                  // corners look natural.
+                  Positioned(
+                    top: bgHeight - 30,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: LoginFormCard(),
+                  ),
                 ],
               ),
             ),
