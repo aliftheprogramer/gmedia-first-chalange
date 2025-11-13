@@ -27,6 +27,8 @@ class GetAllProductsScreen extends StatelessWidget {
               return cubit;
             },
             child: Scaffold(
+              // Allow bottomNavigationBar (with its curved/raised center) to paint over the body
+              extendBody: true,
 
               bottomNavigationBar: CustomBottomNavigator(
                 currentIndex: state,
