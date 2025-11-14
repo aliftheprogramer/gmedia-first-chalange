@@ -15,12 +15,25 @@ class ProductResponseModel extends ProductEntityResponse {
   });
 
   factory ProductResponseModel.fromJson(Map<String, dynamic> json) {
+    // Normalize data coming from POST where everything may be string
+    final dynamic priceRaw = json['price'];
+    int priceInt;
+    if (priceRaw is int) {
+      priceInt = priceRaw;
+    } else if (priceRaw is num) {
+      priceInt = priceRaw.toInt();
+    } else if (priceRaw is String) {
+      priceInt = int.tryParse(priceRaw) ?? 0;
+    } else {
+      priceInt = 0;
+    }
+
     return ProductResponseModel(
-      id: json['id'],
-      categoryId: json['category_id'],
-      name: json['name'],
-      price: json['price'],
-      pictureUrl: json['picture_url'],
+      id: (json['id'] ?? '').toString(),
+      categoryId: (json['category_id'] ?? '').toString(),
+      name: (json['name'] ?? '').toString(),
+      price: priceInt,
+      pictureUrl: (json['picture_url'] ?? '').toString(),
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : null,

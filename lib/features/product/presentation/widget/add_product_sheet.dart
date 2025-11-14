@@ -96,10 +96,44 @@ class _AddProductSheetState extends State<AddProductSheet> {
                   SnackBar(content: Text(state.message)),
                 );
               } else if (state is AddProductSuccess) {
-                // Replace the form content with the success widget
+                // Show success bottom sheet overlay (same behavior as screen)
                 if (mounted) {
-                  setState(() => _showSuccess = true);
+                  setState(() => _showSuccess = true); // keep inline swap as fallback
                 }
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  barrierColor: Colors.black54,
+                  builder: (sheetCtx) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: MediaQuery.of(sheetCtx).viewInsets.bottom),
+                      child: SafeArea(
+                        child: Container(
+                          color: Colors.transparent,
+                          child: CustomSuccessWidget(
+                            onBack: () {
+                              // Close success sheet then close add sheet and go to home
+                              Navigator.of(sheetCtx).pop();
+                              try {
+                                context.read<NavigationCubit>().updateIndex(0);
+                              } catch (_) {}
+                              // Close the add sheet
+                              Navigator.of(context).pop();
+                            },
+                            onAddAnother: () {
+                              // Close only the success sheet and reset form
+                              Navigator.of(sheetCtx).pop();
+                              try {
+                                context.read<AddProductFormCubit>().reset();
+                              } catch (_) {}
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
               }
             },
             builder: (ctx, submitState) {

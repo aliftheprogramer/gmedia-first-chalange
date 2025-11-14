@@ -89,7 +89,7 @@ class CustomSuccessWidget extends StatelessWidget {
               ),
               const SizedBox(width: 16.0), // Jarak antar tombol
 
-              // Tombol "Tambah poduk"
+              // Tombol "Tambah produk"
               Expanded(
                 child: ElevatedButton(
                   onPressed: onAddAnother,
@@ -103,7 +103,7 @@ class CustomSuccessWidget extends StatelessWidget {
                     elevation: 0, // Memberi kesan flat
                   ),
                   child: const Text(
-                    "Tambah poduk",
+                    "Tambah produk",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
