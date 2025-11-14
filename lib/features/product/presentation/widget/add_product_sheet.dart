@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/category/presentation/cubit/category_cubit.dart';
@@ -17,10 +18,40 @@ class AddProductSheet extends StatelessWidget {
 
   Future<void> _pickImage(BuildContext context) async {
     final formCubit = context.read<AddProductFormCubit>();
-    final result = await FilePicker.platform.pickFiles(type: FileType.image, withData: false);
-    if (result != null && result.files.isNotEmpty) {
-      formCubit.setPickedPath(result.files.single.path);
+    final result = await FilePicker.platform.pickFiles(type: FileType.image, withData: true);
+    if (result == null || result.files.isEmpty) return;
+    final file = result.files.single;
+    final path = file.path; // may be null on some platforms
+    final name = file.name;
+    final size = file.size; // bytes length
+
+    // Validate type
+    final lname = name.toLowerCase();
+    if (!(lname.endsWith('.png') || lname.endsWith('.jpg') || lname.endsWith('.jpeg'))) {
+      formCubit.setUploadError('Format harus JPG/PNG');
+      return;
     }
+    // Validate size <=5MB
+    const maxSize = 5 * 1024 * 1024;
+    if (size > maxSize) {
+      formCubit.setUploadError('Ukuran > 5MB');
+      return;
+    }
+
+    // Ensure we have a real path for multipart; if missing create temp file
+    String? finalPath = path;
+    if (finalPath == null) {
+      try {
+        final tempFile = File('${Directory.systemTemp.path}/$name');
+        await tempFile.writeAsBytes(file.bytes ?? []);
+        finalPath = tempFile.path;
+      } catch (e) {
+        formCubit.setUploadError('Gagal membuat file sementara');
+        return;
+      }
+    }
+
+    formCubit.setPickedMeta(path: finalPath, fileName: name, size: size);
   }
 
   @override
@@ -89,7 +120,7 @@ class AddProductSheet extends StatelessWidget {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.add_circle_outline, size: 28, color: Colors.blueAccent),
+                                    // Icon dihilangkan sesuai permintaan
                                     const SizedBox(height: 8),
                                     Wrap(
                                       alignment: WrapAlignment.center,
@@ -109,11 +140,23 @@ class AddProductSheet extends StatelessWidget {
                                     Container(height: 1, color: Colors.grey.shade300),
                                     const SizedBox(height: 8),
                                     Text(
-                                      form.pickedPath == null ? '-' : (form.pickedPath!.split('/').last),
-                                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                                      form.pickedFileName == null
+                                          ? '-'
+                                          : '${form.pickedFileName} • ${(form.pickedFileSize! / 1024).toStringAsFixed(1)}KB',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: form.errorMessage != null ? Colors.redAccent : Colors.black54,
+                                      ),
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                     ),
+                                    if (form.errorMessage != null) ...[
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        form.errorMessage!,
+                                        style: const TextStyle(fontSize: 11, color: Colors.redAccent),
+                                      ),
+                                    ],
                                   ],
                                 ),
                               ),

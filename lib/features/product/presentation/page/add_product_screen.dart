@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/category/presentation/cubit/category_cubit.dart';
@@ -15,14 +16,35 @@ class AddProductScreen extends StatelessWidget {
   const AddProductScreen({super.key});
 
   Future<void> _pickImage(BuildContext context) async {
-    final formCubit = context.read<AddProductFormCubit>();
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      withData: false,
-    );
-    if (result != null && result.files.isNotEmpty) {
-      formCubit.setPickedPath(result.files.single.path);
+    final formCubit = context.read<AddProductFormCubit>(); // capture before await
+    final result = await FilePicker.platform.pickFiles(type: FileType.image, withData: true);
+    if (result == null || result.files.isEmpty) return;
+    final file = result.files.single;
+    String? path = file.path;
+    final name = file.name;
+    final size = file.size;
+
+    final lname = name.toLowerCase();
+    if (!(lname.endsWith('.png') || lname.endsWith('.jpg') || lname.endsWith('.jpeg'))) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Format harus JPG/PNG')));
+      return;
     }
+    const maxSize = 5 * 1024 * 1024;
+    if (size > maxSize) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ukuran file > 5MB')));
+      return;
+    }
+    if (path == null) {
+      try {
+        final tempFile = File('${Directory.systemTemp.path}/$name');
+        await tempFile.writeAsBytes(file.bytes ?? []);
+        path = tempFile.path;
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal membuat file sementara')));
+        return;
+      }
+    }
+    formCubit.setPickedPath(path);
   }
 
   @override
@@ -77,7 +99,7 @@ class AddProductScreen extends StatelessWidget {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.add_circle_outline, size: 28, color: Colors.blueAccent),
+                                // Icon dihilangkan sesuai permintaan
                                 const SizedBox(height: 8),
                                 Wrap(
                                   alignment: WrapAlignment.center,
