@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:typed_data';
 import 'package:gmedia_project/core/resources/data_state.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_request.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
@@ -16,7 +15,9 @@ class AddProductCubit extends Cubit<AddProductState> {
 		required String categoryId,
 		required String name,
 		required String priceText,
-		required String picturePath,
+		String? picturePath,
+		Uint8List? pictureBytes,
+		String? pictureFilename,
 	}) async {
 		// Basic validation
 		if (categoryId.isEmpty) {
@@ -32,13 +33,12 @@ class AddProductCubit extends Cubit<AddProductState> {
 			emit(const AddProductFailure('Harga tidak valid'));
 			return;
 		}
-		if (picturePath.isEmpty) {
-			emit(const AddProductFailure('Path gambar tidak boleh kosong'));
+		if ((picturePath == null || picturePath.isEmpty) && (pictureBytes == null || pictureBytes.isEmpty)) {
+			emit(const AddProductFailure('Gambar tidak boleh kosong'));
 			return;
 		}
-		final file = File(picturePath);
-		if (!await file.exists()) {
-			emit(const AddProductFailure('File gambar tidak ditemukan'));
+		if (pictureFilename == null || pictureFilename.isEmpty) {
+			emit(const AddProductFailure('Nama file tidak tersedia'));
 			return;
 		}
 
@@ -48,7 +48,9 @@ class AddProductCubit extends Cubit<AddProductState> {
 			categoryId: categoryId,
 			name: name,
 			price: price,
-			picture: file,
+			pictureFilename: pictureFilename,
+			picturePath: picturePath,
+			pictureBytes: pictureBytes,
 		);
 
 		try {

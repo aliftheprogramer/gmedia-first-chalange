@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:io';
+import 'dart:io' show File, Directory;
 import 'package:file_picker/file_picker.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/category/presentation/cubit/category_cubit.dart';
@@ -11,6 +11,7 @@ import 'package:gmedia_project/features/product/presentation/cubit/add_product_c
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_state.dart';
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_form_cubit.dart';
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_form_state.dart';
+import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 
 class AddProductScreen extends StatelessWidget {
   const AddProductScreen({super.key});
@@ -20,31 +21,37 @@ class AddProductScreen extends StatelessWidget {
     final result = await FilePicker.platform.pickFiles(type: FileType.image, withData: true);
     if (result == null || result.files.isEmpty) return;
     final file = result.files.single;
-    String? path = file.path;
+    String? path = file.path; // may be null (web or certain pickers)
     final name = file.name;
-    final size = file.size;
+    final size = file.size; // bytes length
+    final bytes = file.bytes;
 
+    // Validate extension
     final lname = name.toLowerCase();
     if (!(lname.endsWith('.png') || lname.endsWith('.jpg') || lname.endsWith('.jpeg'))) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Format harus JPG/PNG')));
       return;
     }
+    // Validate size <= 5MB
     const maxSize = 5 * 1024 * 1024;
     if (size > maxSize) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ukuran file > 5MB')));
       return;
     }
+
+    // If no path (e.g., web), keep bytes and leave path null; if mobile without path, create temp
     if (path == null) {
       try {
         final tempFile = File('${Directory.systemTemp.path}/$name');
-        await tempFile.writeAsBytes(file.bytes ?? []);
+        await tempFile.writeAsBytes(bytes ?? []);
         path = tempFile.path;
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal membuat file sementara')));
-        return;
+        // If even temp file fails, keep bytes-only and continue
+        path = null;
       }
     }
-    formCubit.setPickedPath(path);
+
+    formCubit.setPickedMeta(path: path, fileName: name, size: size, bytes: bytes);
   }
 
   @override
@@ -69,7 +76,11 @@ class AddProductScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Produk berhasil ditambahkan')),
               );
-              Navigator.of(context).pop(true);
+              // Reset ke Home tab lalu kembali ke root
+              try {
+                context.read<NavigationCubit>().updateIndex(0);
+              } catch (_) {}
+              Navigator.of(context).popUntil((route) => route.isFirst);
             }
           },
           builder: (context, submitState) {
@@ -216,11 +227,13 @@ class AddProductScreen extends StatelessWidget {
                                   : () {
                                       final formState = context.read<AddProductFormCubit>().state;
                                       context.read<AddProductCubit>().submit(
-                                            categoryId: formState.selectedCategoryId ?? '',
-                                            name: formState.name,
-                                            priceText: formState.priceText,
-                                            picturePath: formState.pickedPath ?? '',
-                                          );
+                                        categoryId: formState.selectedCategoryId ?? '',
+                                        name: formState.name,
+                                        priceText: formState.priceText,
+                                        picturePath: formState.pickedPath,
+                                        pictureBytes: formState.pickedBytes,
+                                        pictureFilename: formState.pickedFileName,
+                                      );
                                     },
                               child: const Text('Tambah'),
                             ),

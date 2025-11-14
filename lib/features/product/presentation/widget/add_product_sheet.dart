@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:io';
+import 'dart:io' show File, Directory; // only used on non-web platforms
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/category/presentation/cubit/category_cubit.dart';
@@ -11,6 +13,7 @@ import 'package:gmedia_project/features/product/presentation/cubit/add_product_c
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_state.dart';
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_form_cubit.dart';
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_form_state.dart';
+import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 
 /// Bottom sheet content for adding a product. Stateless + managed by cubits.
 class AddProductSheet extends StatelessWidget {
@@ -24,6 +27,7 @@ class AddProductSheet extends StatelessWidget {
     final path = file.path; // may be null on some platforms
     final name = file.name;
     final size = file.size; // bytes length
+    final bytes = file.bytes; // for web or fallback preview
 
     // Validate type
     final lname = name.toLowerCase();
@@ -40,18 +44,30 @@ class AddProductSheet extends StatelessWidget {
 
     // Ensure we have a real path for multipart; if missing create temp file
     String? finalPath = path;
-    if (finalPath == null) {
-      try {
-        final tempFile = File('${Directory.systemTemp.path}/$name');
-        await tempFile.writeAsBytes(file.bytes ?? []);
-        finalPath = tempFile.path;
-      } catch (e) {
-        formCubit.setUploadError('Gagal membuat file sementara');
+    Uint8List? finalBytes = bytes;
+
+    // On web we rely on bytes only (no real path)
+    if (kIsWeb) {
+      finalPath = null; // ensure we don't depend on path
+      if (finalBytes == null) {
+        formCubit.setUploadError('Bytes tidak tersedia');
         return;
+      }
+    } else {
+      // Non-web fallback: if path missing create temp file
+      if (finalPath == null) {
+        try {
+          final tempFile = File('${Directory.systemTemp.path}/$name');
+          await tempFile.writeAsBytes(bytes ?? []);
+          finalPath = tempFile.path;
+        } catch (e) {
+          formCubit.setUploadError('Gagal membuat file sementara');
+          return;
+        }
       }
     }
 
-    formCubit.setPickedMeta(path: finalPath, fileName: name, size: size);
+    formCubit.setPickedMeta(path: finalPath, fileName: name, size: size, bytes: finalBytes);
   }
 
   @override
@@ -75,6 +91,10 @@ class AddProductSheet extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Produk berhasil ditambahkan')),
                 );
+                // Pindah ke tab Home lalu tutup sheet
+                try {
+                  context.read<NavigationCubit>().updateIndex(0);
+                } catch (_) {}
                 Navigator.of(context).pop(true); // close sheet
               }
             },
@@ -113,53 +133,121 @@ class AddProductSheet extends StatelessWidget {
                           if (isSubmitting) const SizedBox(height: 12),
                           // Upload area with dashed border (custom painter simpler solution)
                           _DashedBorder(
-                            child: InkWell(
-                              onTap: () => _pickImage(context),
-                              child: SizedBox(
-                                height: 160,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    // Icon dihilangkan sesuai permintaan
-                                    const SizedBox(height: 8),
-                                    Wrap(
-                                      alignment: WrapAlignment.center,
-                                      children: const [
-                                        Text('Seret & Letakkan atau ', style: TextStyle(color: Colors.black87)),
-                                        Text('Pilih File', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.w600)),
-                                        Text(' untuk diunggah', style: TextStyle(color: Colors.black87)),
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 250),
+                              child: ((form.pickedPath != null || form.pickedBytes != null) && form.pickedFileName != null)
+                                  ? Column(
+                                      key: const ValueKey('preview'),
+                                      children: [
+                                        // Preview area
+                                        SizedBox(
+                                          height: 120,
+                                          width: double.infinity,
+                                          child: ClipRRect(
+                                            borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+                                              child: Builder(
+                                                builder: (_) {
+                                                  if (form.pickedBytes != null) {
+                                                    return Image.memory(
+                                                      form.pickedBytes!,
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (_, __, ___) => const Center(child: Text('Gagal memuat gambar')),
+                                                    );
+                                                  }
+                                                  if (form.pickedPath != null) {
+                                                    return Image.file(
+                                                      File(form.pickedPath!),
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (_, __, ___) => const Center(child: Text('Gagal memuat gambar')),
+                                                    );
+                                                  }
+                                                  return const Center(child: Text('Tidak ada gambar'));
+                                                },
+                                              ),
+                                          ),
+                                        ),
+                                        Container(height: 1, color: Colors.grey.shade300),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${form.pickedFileName} • ${(form.pickedFileSize! / 1024).toStringAsFixed(1)}KB',
+                                                style: const TextStyle(fontSize: 12, color: Colors.black87),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(height: 6),
+                                              Row(
+                                                children: [
+                                                  TextButton(
+                                                    onPressed: () => context.read<AddProductFormCubit>().clearPickedFile(),
+                                                    child: const Text('Hapus'),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  ElevatedButton(
+                                                    onPressed: () => _pickImage(context),
+                                                    style: ElevatedButton.styleFrom(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                                      backgroundColor: const Color(0xFF1E63F9),
+                                                    ),
+                                                    child: const Text('Ganti'),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ],
-                                    ),
-                                    const SizedBox(height: 6),
-                                    const Text(
-                                      'Format Yang Didukung: Jpg & Png\nUkuran File Maximum 5Mb',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 12, color: Colors.black54, height: 1.2),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Container(height: 1, color: Colors.grey.shade300),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      form.pickedFileName == null
-                                          ? '-'
-                                          : '${form.pickedFileName} • ${(form.pickedFileSize! / 1024).toStringAsFixed(1)}KB',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: form.errorMessage != null ? Colors.redAccent : Colors.black54,
+                                    )
+                                  : InkWell(
+                                      key: const ValueKey('placeholder'),
+                                      onTap: () => _pickImage(context),
+                                      child: SizedBox(
+                                        height: 160,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            const SizedBox(height: 8),
+                                            Wrap(
+                                              alignment: WrapAlignment.center,
+                                              children: const [
+                                                Text('Seret & Letakkan atau ', style: TextStyle(color: Colors.black87)),
+                                                Text('Pilih File', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.w600)),
+                                                Text(' untuk diunggah', style: TextStyle(color: Colors.black87)),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 6),
+                                            const Text(
+                                              'Format Yang Didukung: Jpg & Png\nUkuran File Maximum 5Mb',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(fontSize: 12, color: Colors.black54, height: 1.2),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            Container(height: 1, color: Colors.grey.shade300),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              form.pickedFileName == null
+                                                  ? '-'
+                                                  : '${form.pickedFileName} • ${(form.pickedFileSize! / 1024).toStringAsFixed(1)}KB',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: form.errorMessage != null ? Colors.redAccent : Colors.black54,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                            if (form.errorMessage != null) ...[
+                                              const SizedBox(height: 6),
+                                              Text(
+                                                form.errorMessage!,
+                                                style: const TextStyle(fontSize: 11, color: Colors.redAccent),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
                                       ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
                                     ),
-                                    if (form.errorMessage != null) ...[
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        form.errorMessage!,
-                                        style: const TextStyle(fontSize: 11, color: Colors.redAccent),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -245,11 +333,13 @@ class AddProductSheet extends StatelessWidget {
                                       : () {
                                           final formState = context.read<AddProductFormCubit>().state;
                                           context.read<AddProductCubit>().submit(
-                                                categoryId: formState.selectedCategoryId ?? '',
-                                                name: formState.name,
-                                                priceText: formState.priceText,
-                                                picturePath: formState.pickedPath ?? '',
-                                              );
+                                            categoryId: formState.selectedCategoryId ?? '',
+                                            name: formState.name,
+                                            priceText: formState.priceText,
+                                            picturePath: formState.pickedPath,
+                                            pictureBytes: formState.pickedBytes,
+                                            pictureFilename: formState.pickedFileName,
+                                          );
                                         },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF1E63F9),

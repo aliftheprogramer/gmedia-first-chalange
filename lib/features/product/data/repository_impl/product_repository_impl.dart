@@ -42,7 +42,9 @@ class ProductRepositoryImpl implements ProductRepository {
       categoryId: request.categoryId,
       name: request.name,
       price: request.price,
-      picture: request.picture,
+      pictureFilename: request.pictureFilename,
+      picturePath: request.picturePath,
+      pictureBytes: request.pictureBytes,
     );
 
     final httpResponse = await _productApiService.createProduct(requestModel);
@@ -60,7 +62,9 @@ class ProductRepositoryImpl implements ProductRepository {
       categoryId: request.categoryId,
       name: request.name,
       price: request.price,
-      picture: request.picture,
+      pictureFilename: request.pictureFilename,
+      picturePath: request.picturePath,
+      pictureBytes: request.pictureBytes,
     );
 
     final httpResponse = await _productApiService.updateProduct(id, requestModel);

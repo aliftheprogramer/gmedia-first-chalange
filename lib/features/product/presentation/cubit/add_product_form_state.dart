@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'dart:typed_data';
 
 class AddProductFormState extends Equatable {
   final String name;
@@ -8,6 +9,7 @@ class AddProductFormState extends Equatable {
   final String? pickedFileName; // original name
   final int? pickedFileSize; // bytes length
   final String? errorMessage; // upload validation error
+  final Uint8List? pickedBytes; // raw bytes (web or fallback)
 
   const AddProductFormState({
     this.name = '',
@@ -17,6 +19,7 @@ class AddProductFormState extends Equatable {
     this.pickedFileName,
     this.pickedFileSize,
     this.errorMessage,
+    this.pickedBytes,
   });
 
   AddProductFormState copyWith({
@@ -27,6 +30,7 @@ class AddProductFormState extends Equatable {
     String? pickedFileName,
     int? pickedFileSize,
     String? errorMessage,
+    Uint8List? pickedBytes,
     bool clearError = false,
   }) {
     return AddProductFormState(
@@ -37,9 +41,10 @@ class AddProductFormState extends Equatable {
       pickedFileName: pickedFileName ?? this.pickedFileName,
       pickedFileSize: pickedFileSize ?? this.pickedFileSize,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      pickedBytes: pickedBytes ?? this.pickedBytes,
     );
   }
 
   @override
-  List<Object?> get props => [name, priceText, selectedCategoryId, pickedPath, pickedFileName, pickedFileSize, errorMessage];
+  List<Object?> get props => [name, priceText, selectedCategoryId, pickedPath, pickedFileName, pickedFileSize, errorMessage, pickedBytes];
 }
