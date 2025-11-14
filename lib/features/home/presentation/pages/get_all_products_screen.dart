@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/features/category/presentation/widget/list_category_widget.dart';
 import 'package:gmedia_project/features/home/presentation/widget/custom_search_bar.dart';
-import 'package:gmedia_project/features/home/presentation/widget/get_all_products/get_category_product.dart';
+import 'package:gmedia_project/features/home/presentation/widget/get_all_products/get_all_product.dart';
 import 'package:gmedia_project/features/home/presentation/widget/home/home_app_bar.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 import 'package:gmedia_project/widget/custom_bottom_navigator.dart';

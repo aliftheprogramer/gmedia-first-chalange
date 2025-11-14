@@ -12,6 +12,7 @@ import 'package:gmedia_project/features/product/presentation/cubit/add_product_s
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_form_cubit.dart';
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_form_state.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
+import 'package:gmedia_project/widget/custom_success_widget.dart';
 
 class AddProductScreen extends StatelessWidget {
   const AddProductScreen({super.key});
@@ -73,14 +74,42 @@ class AddProductScreen extends StatelessWidget {
                 SnackBar(content: Text(state.message)),
               );
             } else if (state is AddProductSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Produk berhasil ditambahkan')),
+              // Show custom success widget as an overlay (bottom sheet).
+              // Keep state logic unchanged; we only show UI overlay here.
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                barrierColor: Colors.black54,
+                builder: (sheetCtx) {
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: MediaQuery.of(sheetCtx).viewInsets.bottom),
+                    child: SafeArea(
+                      child: Container(
+                        // allow the custom widget to define its own rounded container
+                        color: Colors.transparent,
+                        child: CustomSuccessWidget(
+                          onBack: () {
+                            // Close sheet then navigate back to home/root
+                            Navigator.of(sheetCtx).pop();
+                            try {
+                              sheetCtx.read<NavigationCubit>().updateIndex(0);
+                            } catch (_) {}
+                            Navigator.of(sheetCtx).popUntil((route) => route.isFirst);
+                          },
+                          onAddAnother: () {
+                            // Close sheet and reset the form so user can add another product
+                            Navigator.of(sheetCtx).pop();
+                            try {
+                              context.read<AddProductFormCubit>().reset();
+                            } catch (_) {}
+                          },
+                        ),
+                      ),
+                    ),
+                  );
+                },
               );
-              // Reset ke Home tab lalu kembali ke root
-              try {
-                context.read<NavigationCubit>().updateIndex(0);
-              } catch (_) {}
-              Navigator.of(context).popUntil((route) => route.isFirst);
             }
           },
           builder: (context, submitState) {

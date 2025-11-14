@@ -14,10 +14,18 @@ import 'package:gmedia_project/features/product/presentation/cubit/add_product_s
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_form_cubit.dart';
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_form_state.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
+import 'package:gmedia_project/widget/custom_success_widget.dart';
 
-/// Bottom sheet content for adding a product. Stateless + managed by cubits.
-class AddProductSheet extends StatelessWidget {
+/// Bottom sheet content for adding a product. Now swaps to a success widget on submit.
+class AddProductSheet extends StatefulWidget {
   const AddProductSheet({super.key});
+
+  @override
+  State<AddProductSheet> createState() => _AddProductSheetState();
+}
+
+class _AddProductSheetState extends State<AddProductSheet> {
+  bool _showSuccess = false;
 
   Future<void> _pickImage(BuildContext context) async {
     final formCubit = context.read<AddProductFormCubit>();
@@ -88,14 +96,10 @@ class AddProductSheet extends StatelessWidget {
                   SnackBar(content: Text(state.message)),
                 );
               } else if (state is AddProductSuccess) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Produk berhasil ditambahkan')),
-                );
-                // Pindah ke tab Home lalu tutup sheet
-                try {
-                  context.read<NavigationCubit>().updateIndex(0);
-                } catch (_) {}
-                Navigator.of(context).pop(true); // close sheet
+                // Replace the form content with the success widget
+                if (mounted) {
+                  setState(() => _showSuccess = true);
+                }
               }
             },
             builder: (ctx, submitState) {
@@ -110,7 +114,24 @@ class AddProductSheet extends StatelessWidget {
                     // ensure space for keyboard
                     bottom: MediaQuery.of(context).viewInsets.bottom + 16,
                   ),
-                  child: BlocBuilder<AddProductFormCubit, AddProductFormState>(
+                  child: _showSuccess
+                      ? CustomSuccessWidget(
+                          onBack: () {
+                            // Close the sheet and navigate to Home tab if available
+                            Navigator.of(context).pop();
+                            try {
+                              context.read<NavigationCubit>().updateIndex(0);
+                            } catch (_) {}
+                          },
+                          onAddAnother: () {
+                            // Reset to form mode and clear fields
+                            setState(() => _showSuccess = false);
+                            try {
+                              context.read<AddProductFormCubit>().reset();
+                            } catch (_) {}
+                          },
+                        )
+                      : BlocBuilder<AddProductFormCubit, AddProductFormState>(
                     builder: (context, form) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,

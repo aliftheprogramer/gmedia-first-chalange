@@ -31,20 +31,24 @@ class ProductsPlaceholder extends StatelessWidget {
           } else if (state is ProductSellLoaded) {
             final products = state.products.cast<ProductEntityResponse>();
             content = SingleChildScrollView(
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 0.9,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    // match ProductSellWidget: make items taller
+                    childAspectRatio: 0.62,
+                  ),
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    final p = products[index];
+                    return ProductSellItem(product: p);
+                  },
                 ),
-                itemCount: products.length,
-                itemBuilder: (context, index) {
-                  final p = products[index];
-                  return ProductSellItem(product: p);
-                },
               ),
             );
           } else {

@@ -100,11 +100,12 @@ class ProductSellWidget extends StatelessWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            childAspectRatio: 0.9,
-                          ),
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  // make items taller by reducing the aspect ratio
+                                  childAspectRatio: 0.62,
+                                ),
                       itemCount: products.length,
                       itemBuilder: (context, index) {
                         final p = products[index];
@@ -141,63 +142,71 @@ class ProductSellItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: SizedBox(
-              height: 140,
-              width: double.infinity,
-              child: Builder(
-                builder: (context) {
-                  if (product.pictureUrl.isEmpty) {
-                    return Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(Icons.image, color: Colors.grey),
-                      ),
-                    );
-                  }
-
-                  String imageUrl = product.pictureUrl.trim();
-                  if (imageUrl.startsWith('http://')) {
-                    imageUrl = imageUrl.replaceFirst('http://', 'https://');
-                  }
-
-                  final logger = sl<Logger>();
-
-                  return CachedNetworkImage(
-                    imageUrl: imageUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) {
-                      try {
-                        logger.e('Failed loading product image');
-                      } catch (_) {
-                        logger.e('Image load error: $url -> $error');
-                      }
+          // Let the image take the available top space so the card can be taller
+          Expanded(
+            flex: 6,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                width: double.infinity,
+                child: Builder(
+                  builder: (context) {
+                    if (product.pictureUrl.isEmpty) {
                       return Container(
                         color: Colors.grey[200],
                         child: const Center(
-                          child: Icon(Icons.broken_image, color: Colors.grey),
+                          child: Icon(Icons.image, color: Colors.grey),
                         ),
                       );
-                    },
-                  );
-                },
+                    }
+
+                    String imageUrl = product.pictureUrl.trim();
+                    if (imageUrl.startsWith('http://')) {
+                      imageUrl = imageUrl.replaceFirst('http://', 'https://');
+                    }
+
+                    final logger = sl<Logger>();
+
+                    return CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) {
+                        try {
+                          logger.e('Failed loading product image');
+                        } catch (_) {
+                          logger.e('Image load error: $url -> $error');
+                        }
+                        return Container(
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: Icon(Icons.broken_image, color: Colors.grey),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            product.name,
-            maxLines: 2,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          // Make title flexible to avoid overflow and ensure ellipsis
+          Flexible(
+            flex: 2,
+            child: Text(
+              product.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           Text(
             'Rp.$formattedPrice',
             style: const TextStyle(
@@ -208,18 +217,23 @@ class ProductSellItem extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          CustomButtonCart(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    '${product.name} telah ditambahkan ke keranjang',
-                  ),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
+          // Constrain the button height so it won't overflow
+          SizedBox(
+            height: 40,
             width: double.infinity,
+            child: CustomButtonCart(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${product.name} telah ditambahkan ke keranjang',
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              width: double.infinity,
+            ),
           ),
         ],
       ),
