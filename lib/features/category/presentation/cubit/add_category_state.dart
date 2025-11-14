@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:gmedia_project/features/category/domain/entity/entity_response_category.dart';
+// category response entity removed from success state as create returns void
 
 abstract class AddCategoryState extends Equatable {
   const AddCategoryState();
@@ -17,11 +17,10 @@ class AddCategorySubmitting extends AddCategoryState {
 }
 
 class AddCategorySuccess extends AddCategoryState {
-  final CategoryEntityResponse category;
-  const AddCategorySuccess(this.category);
+  const AddCategorySuccess();
 
   @override
-  List<Object?> get props => [category];
+  List<Object?> get props => [];
 }
 
 class AddCategoryFailure extends AddCategoryState {

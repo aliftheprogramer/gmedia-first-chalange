@@ -244,7 +244,7 @@ class _AddProductSheetState extends State<AddProductSheet> {
                                                     onPressed: () => _pickImage(context),
                                                     style: ElevatedButton.styleFrom(
                                                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                                      backgroundColor: const Color(0xFF1E63F9),
+                                                      backgroundColor: const Color(0xFF2C59E5),
                                                     ),
                                                     child: const Text('Ganti'),
                                                   ),
@@ -369,8 +369,8 @@ class _AddProductSheetState extends State<AddProductSheet> {
                                 child: OutlinedButton(
                                   onPressed: isSubmitting ? null : () => Navigator.of(context).pop(),
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: const Color(0xFF1E63F9),
-                                    side: const BorderSide(color: Color(0xFF1E63F9), width: 1),
+                                    foregroundColor: const Color(0xFF2C59E5),
+                                    side: const BorderSide(color: Color(0xFF2C59E5), width: 1),
                                     padding: const EdgeInsets.symmetric(vertical: 14),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(4),
@@ -397,7 +397,7 @@ class _AddProductSheetState extends State<AddProductSheet> {
                                           );
                                         },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF1E63F9),
+                                    backgroundColor: const Color(0xFF2C59E5),
                                     foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(vertical: 14),
                                     shape: RoundedRectangleBorder(

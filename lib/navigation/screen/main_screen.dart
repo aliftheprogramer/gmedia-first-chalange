@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/features/home/presentation/pages/home_screen.dart';
 // Removed full-page AddProductScreen usage; using bottom sheet variant instead.
 import 'package:gmedia_project/features/product/presentation/widget/add_product_sheet.dart';
-import 'package:gmedia_project/features/category/presentation/page/add_category_screen.dart';
+import 'package:gmedia_project/features/category/presentation/widget/add_category_sheet.dart';
 
 import 'package:gmedia_project/features/profile/presentation/page/profile_screen.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
@@ -57,8 +57,15 @@ class MainScreen extends StatelessWidget {
                     },
                     onKategoriTap: () {
                       Navigator.of(ctx).pop();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const AddCategoryScreen()),
+                      // Show category form as bottom sheet overlay (match product)
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        builder: (_) => const AddCategorySheet(),
                       );
                     },
                   );

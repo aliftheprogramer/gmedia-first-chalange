@@ -35,12 +35,12 @@ class CustomSuccessWidget extends StatelessWidget {
           ),
           const SizedBox(height: 24.0),
 
-          // Placeholder untuk ilustrasi.
-          // Anda bisa menggantinya dengan Image.asset('path/to/your/image.png')
-          const Icon(
-            Icons.check_circle_outline,
-            color: Colors.blue, // Menggunakan warna biru seperti di screenshot
-            size: 100.0,
+          // Ilustrasi menggunakan aset gambar
+          Image.asset(
+            'assets/success.png',
+            width: 100,
+            height: 100,
+            fit: BoxFit.contain,
           ),
           const SizedBox(height: 24.0),
 
