@@ -4,7 +4,6 @@ import 'package:gmedia_project/features/category/domain/usecase/create_new_categ
 import 'package:gmedia_project/features/category/presentation/cubit/add_category_state.dart';
 import 'package:logger/logger.dart';
 
-// Simple logger for important events in the category flow
 final Logger _log = Logger();
 
 class AddCategoryCubit extends Cubit<AddCategoryState> {

@@ -22,7 +22,6 @@ class CategoryRepositoryImpl implements CategoryRepository{
       try {
         _log.i('[CategoryRepository] createCategory success');
       } catch (_) {}
-      // Treat create as void success regardless of body
       return DataSuccess(data: null);
     }
     try {
@@ -63,7 +62,6 @@ class CategoryRepositoryImpl implements CategoryRepository{
   
   @override
   Future<DataState<CategoryEntityResponse>> getCategoryById(String id) {
-    // TODO: implement getCategoryById
     throw UnimplementedError();
   }
 }

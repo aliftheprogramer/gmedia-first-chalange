@@ -1,5 +1,3 @@
-// lib/core/services/services_locator.dart
-
 import 'package:get_it/get_it.dart';
 import 'package:gmedia_project/common/bloc/auth/auth_cubit.dart';
 import 'package:gmedia_project/core/network/dio_client.dart';
@@ -27,7 +25,7 @@ import 'package:gmedia_project/features/product/data/source/product_api_service.
 import 'package:gmedia_project/features/product/domain/repository/product_repository.dart';
 import 'package:gmedia_project/features/product/domain/usecase/add_product_usecase.dart';
 import 'package:gmedia_project/features/product/domain/usecase/delete_product_usecase.dart';
-import 'package:gmedia_project/features/product/domain/usecase/edit_product_usecase.dart'; // <-- Diperbaiki
+import 'package:gmedia_project/features/product/domain/usecase/edit_product_usecase.dart';
 import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
 import 'package:gmedia_project/features/product/domain/usecase/get_product_detail.dart';
 import 'package:gmedia_project/features/welcome/data/repository_impl/welcome_repository_impl.dart';
@@ -36,7 +34,7 @@ import 'package:gmedia_project/features/welcome/domain/repository/welcome_reposi
 import 'package:gmedia_project/features/welcome/domain/usecase/is_first_run_usecase.dart';
 import 'package:gmedia_project/features/welcome/domain/usecase/set_first_run_complete_usecase.dart';
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
-import 'package:logger/logger.dart'; // <-- Ditambahkan
+import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_cubit.dart';
 
@@ -47,7 +45,7 @@ Future<void> setUpServiceLocator() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => DioClient());
-  sl.registerLazySingleton(() => Logger()); // <-- DITAMBAHKAN: Registrasi Logger
+  sl.registerLazySingleton(() => Logger());
 
   // Data Sources
   sl.registerLazySingleton<AuthLocalService>(() => AuthLocalServiceImpl(sl()));

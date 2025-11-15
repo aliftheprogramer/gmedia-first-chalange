@@ -8,10 +8,8 @@ class CustomSuccessWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Menggunakan Container untuk membuat tampilan bottom sheet
-    // dengan sudut membulat di bagian atas.
     return Container(
-      // Padding untuk memberi jarak konten dari tepi
+
       padding: const EdgeInsets.fromLTRB(24.0, 12.0, 24.0, 32.0),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -19,12 +17,12 @@ class CustomSuccessWidget extends StatelessWidget {
           top: Radius.circular(20.0),
         ),
       ),
-      // Column untuk menampung semua elemen secara vertikal
+
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Agar tinggi bottom sheet pas dengan konten
+        mainAxisSize: MainAxisSize.min, 
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Garis handle abu-abu di bagian atas
+
           Container(
             width: 40.0,
             height: 4.0,
@@ -34,8 +32,6 @@ class CustomSuccessWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24.0),
-
-          // Ilustrasi menggunakan aset gambar
           Image.asset(
             'assets/success.png',
             width: 100,
@@ -55,21 +51,19 @@ class CustomSuccessWidget extends StatelessWidget {
           ),
           const SizedBox(height: 12.0),
 
-          // Teks Subjudul
           Text(
             "Produk kamu sudah masuk daftar! Yuk, tambahin lagi.",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16.0,
-              color: Colors.grey[600], // Warna abu-abu untuk subjudul
+              color: Colors.grey[600], 
             ),
           ),
           const SizedBox(height: 32.0),
 
-          // Baris untuk menampung kedua tombol
           Row(
             children: [
-              // Tombol "Kembali"
+
               Expanded(
                 child: OutlinedButton(
                   onPressed: onBack,
@@ -87,9 +81,7 @@ class CustomSuccessWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 16.0), // Jarak antar tombol
-
-              // Tombol "Tambah produk"
+              const SizedBox(width: 16.0), 
               Expanded(
                 child: ElevatedButton(
                   onPressed: onAddAnother,
@@ -100,7 +92,7 @@ class CustomSuccessWidget extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     ),
-                    elevation: 0, // Memberi kesan flat
+                    elevation: 0, 
                   ),
                   child: const Text(
                     "Tambah produk",

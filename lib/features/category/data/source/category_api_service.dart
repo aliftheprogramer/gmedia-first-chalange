@@ -34,7 +34,6 @@ class CategoryApiServiceImpl implements CategoryApiService {
       final response = await _dioClient.post(ApiUrls.category, data: formData);
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        // Some APIs return the created resource, some return empty body. We treat create as void success.
         try {
           sl<Logger>().i('[CategoryApiService] createCategory success status=${response.statusCode}');
         } catch (_) {}

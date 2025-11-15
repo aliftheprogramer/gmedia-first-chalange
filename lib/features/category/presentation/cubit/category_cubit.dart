@@ -9,7 +9,6 @@ class CategoryCubit extends Cubit<CategoryState> {
 
   CategoryCubit(this._getAllCategoryUsecase) : super(const CategoryInitial());
 
-  // cache data & selection
   List<CategoryEntityResponse> _categories = [];
   String? selectedId;
   String? selectedName;
@@ -32,7 +31,6 @@ class CategoryCubit extends Cubit<CategoryState> {
     }
   }
 
-  /// Simpan id & name dari category terpilih dan emisi state klik.
   void selectCategory(CategoryEntityResponse category) {
     selectedId = category.id;
     selectedName = category.name;
@@ -44,7 +42,6 @@ class CategoryCubit extends Cubit<CategoryState> {
     ));
   }
 
-  /// Opsional: hapus pilihan
   void clearSelection() {
     selectedId = null;
     selectedName = null;

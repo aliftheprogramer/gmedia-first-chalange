@@ -17,7 +17,7 @@ class ListCategoryWidget extends StatelessWidget {
       return _CategoryListView(categories: categories!, selectedId: null);
     }
 
-    // Expect a CategoryCubit to be provided by an ancestor (e.g., the screen).
+    
     return BlocBuilder<CategoryCubit, CategoryState>(
       builder: (context, state) {
         if (state is CategoryLoading) {
@@ -56,7 +56,7 @@ class _CategoryListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Provide a local cubit that owns the ScrollController and scroll behaviour.
+    
     return BlocProvider(
       create: (_) => CategoryListCubit(),
       child: _CategoryListViewContent(categories: categories, selectedId: selectedId),
@@ -107,7 +107,7 @@ class _CategoryListViewContent extends StatelessWidget {
             ),
           ),
 
-          // Tombol '>'
+          
           InkWell(
             borderRadius: BorderRadius.circular(20),
             onTap: () => listCubit.scrollRight(),

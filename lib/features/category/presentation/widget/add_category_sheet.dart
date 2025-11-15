@@ -8,7 +8,6 @@ import 'package:gmedia_project/features/category/presentation/cubit/add_category
 import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 import 'package:gmedia_project/widget/custom_success_widget.dart';
 
-/// Bottom sheet for adding a category with the same overlay success UX as AddProductSheet.
 class AddCategorySheet extends StatefulWidget {
   const AddCategorySheet({super.key});
 
@@ -35,10 +34,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                   SnackBar(content: Text(state.message)),
                 );
               } else if (state is AddCategorySuccess) {
-                if (mounted) {
-                  // Hanya ganti konten sheet ke widget sukses (tanpa overlay tambahan)
-                  setState(() => _showSuccess = true);
-                }
+                if (mounted) setState(() => _showSuccess = true);
               }
             },
             builder: (ctx, state) {
@@ -74,7 +70,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                // drag handle
+                                
                                 Center(
                                   child: Container(
                                     width: 40,
@@ -94,7 +90,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                                 if (isSubmitting) const LinearProgressIndicator(),
                                 if (isSubmitting) const SizedBox(height: 12),
 
-                                // Card-style container for the single field
+                                
                                 Container(
                                   decoration: BoxDecoration(
                                     border: Border.all(color: Colors.grey.shade400),

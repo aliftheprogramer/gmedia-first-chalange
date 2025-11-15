@@ -57,19 +57,17 @@ class _AddCategoryViewState extends State<_AddCategoryView> {
             return SafeArea(
               child: CustomSuccessWidget(
                 onBack: () {
-                  // Kembali ke root/home
-                  try {
-                    context.read<NavigationCubit>().updateIndex(0);
-                  } catch (_) {}
-                  Navigator.of(context).popUntil((route) => route.isFirst);
+                    try {
+                      context.read<NavigationCubit>().updateIndex(0);
+                    } catch (_) {}
+                    Navigator.of(context).popUntil((route) => route.isFirst);
                 },
                 onAddAnother: () {
-                  // Tampilkan form kembali
-                  setState(() => _showSuccess = false);
-                  try {
-                    context.read<AddCategoryFormCubit>().reset();
-                    context.read<AddCategoryCubit>().reset();
-                  } catch (_) {}
+                    setState(() => _showSuccess = false);
+                    try {
+                      context.read<AddCategoryFormCubit>().reset();
+                      context.read<AddCategoryCubit>().reset();
+                    } catch (_) {}
                 },
               ),
             );
@@ -83,14 +81,12 @@ class _AddCategoryViewState extends State<_AddCategoryView> {
                 if (isSubmitting) const LinearProgressIndicator(),
                 if (isSubmitting) const SizedBox(height: 12),
 
-                // Section title to match mock
                 Text(
                   'Tambah Kategori',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 12),
 
-                // Card-style container (match add product look & feel)
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey.shade400),

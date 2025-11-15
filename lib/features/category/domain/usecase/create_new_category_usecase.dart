@@ -8,8 +8,6 @@ class CreateNewCategoryUsecase implements Usecase<DataState<void>, String> {
 
   CreateNewCategoryUsecase(this.repository);
 
-  // Note: Usecase-level logging is optional; repository/service also log detailed events.
-
   @override
   Future<DataState<void>> call({String? param}) {
     if (param == null || param.isEmpty) {

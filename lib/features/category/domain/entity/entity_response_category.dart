@@ -1,5 +1,3 @@
-
-// Generated entity for category API response
 class CategoryEntityResponse {
 	final String id;
 	final String name;
