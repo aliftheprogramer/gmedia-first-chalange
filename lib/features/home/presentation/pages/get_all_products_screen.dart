@@ -17,54 +17,41 @@ class GetAllProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: BlocBuilder<NavigationCubit, int>(
-        builder: (context, state) {
-          return BlocProvider(
-            create: (_) {
-              final cubit = CategoryCubit(sl<GetAllCategoryUsecase>());
-              cubit.fetchCategories();
-              return cubit;
-            },
-            child: Scaffold(
-              extendBody: true,
-
-              bottomNavigationBar: CustomBottomNavigator(
-                currentIndex: state,
-                onTap: (index) {
-                  // Update the selected tab in the global NavigationCubit
-                  if (index != state) {
-                    context.read<NavigationCubit>().updateIndex(index);
-                  }
-                  // Since this screen is pushed on top of MainScreen,
-                  // pop back to the root so the MainScreen body updates.
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
-              ),
-              body: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const HomeAppBar(),
-                  const SizedBox(height: 24),
-                  // 1) SEARCH di paling atas
-                  const SearchBarWidget(),
-                  const SizedBox(height: 12),
-
-                  // 2) NAV kategori (horizontal) tepat di bawah search
-                  const ListCategoryWidget(),
-                  const SizedBox(height: 12),
-
-                  const Expanded(
-                    child: ProductsPlaceholder(),
-                  ),
-                ],
-              ),
+    return BlocBuilder<NavigationCubit, int>(
+      builder: (context, navIndex) {
+        return BlocProvider(
+          create: (_) {
+            final cubit = CategoryCubit(sl<GetAllCategoryUsecase>());
+            cubit.fetchCategories();
+            return cubit;
+          },
+          child: Scaffold(
+            extendBody: true,
+            backgroundColor: Colors.white,
+            appBar: const HomeAppBar(),
+            bottomNavigationBar: CustomBottomNavigator(
+              currentIndex: navIndex,
+              onTap: (index) {
+                if (index != navIndex) {
+                  context.read<NavigationCubit>().updateIndex(index);
+                }
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
             ),
-          );
-        },
-      ),
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: const [
+                SizedBox(height: 24),
+                SearchBarWidget(),
+                SizedBox(height: 12),
+                ListCategoryWidget(),
+                SizedBox(height: 12),
+                Expanded(child: ProductsPlaceholder()),
+              ],
+            ),
+          ),
+        );
+      },
     );
-    
   }
 }
-

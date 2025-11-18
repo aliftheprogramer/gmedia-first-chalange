@@ -13,8 +13,8 @@ class ProductsPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_){
-        final cubit = ProductSellCubit(sl <GetListProductUsecase>());
+      create: (_) {
+        final cubit = ProductSellCubit(sl<GetListProductUsecase>());
         cubit.fetchSoldProductsAll();
         return cubit;
       },
@@ -25,7 +25,9 @@ class ProductsPlaceholder extends StatelessWidget {
           if (state is ProductSellLoading) {
             content = const Center(child: CircularProgressIndicator());
           } else if (state is ProductSellEmpty) {
-            content = const Center(child: Text('Tidak ada produk yang dijual.'));
+            content = const Center(
+              child: Text('Tidak ada produk yang dijual.'),
+            );
           } else if (state is ProductSellError) {
             content = Center(child: Text('Error: ${state.message}'));
           } else if (state is ProductSellLoaded) {
@@ -56,10 +58,15 @@ class ProductsPlaceholder extends StatelessWidget {
           }
 
           return Container(
-            color: Colors.white,
             padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+            ),
             child: content,
-
           );
         },
       ),
