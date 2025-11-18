@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/core/resources/data_state.dart';
 import 'package:gmedia_project/features/category/domain/entity/entity_response_category.dart';
 import 'package:gmedia_project/features/category/domain/usecase/get_all_category_usecase.dart';
+import 'package:gmedia_project/core/services/services_locator.dart';
+import 'package:logger/logger.dart';
 import 'package:gmedia_project/features/category/presentation/cubit/category_state.dart';
 
 class CategoryCubit extends Cubit<CategoryState> {
@@ -19,7 +21,13 @@ class CategoryCubit extends Cubit<CategoryState> {
       final res = await _getAllCategoryUsecase.call();
       if (res is DataSuccess && res.data != null) {
         _categories = res.data!;
-        emit(CategoryLoaded(_categories, selectedId: selectedId, selectedName: selectedName));
+        emit(
+          CategoryLoaded(
+            _categories,
+            selectedId: selectedId,
+            selectedName: selectedName,
+          ),
+        );
       } else if (res is DataFailed) {
         emit(CategoryError(res.error?.message ?? 'Failed to load categories'));
       } else {
@@ -34,12 +42,16 @@ class CategoryCubit extends Cubit<CategoryState> {
   void selectCategory(CategoryEntityResponse category) {
     selectedId = category.id;
     selectedName = category.name;
+    final logger = sl<Logger>();
+    logger.i('Category selected: id=${selectedId}, name=${selectedName}');
 
-    emit(CategoryIsClicked(
-      categories: _categories,
-      categoryId: selectedId!,
-      categoryName: selectedName!,
-    ));
+    emit(
+      CategoryIsClicked(
+        categories: _categories,
+        categoryId: selectedId!,
+        categoryName: selectedName!,
+      ),
+    );
   }
 
   void clearSelection() {

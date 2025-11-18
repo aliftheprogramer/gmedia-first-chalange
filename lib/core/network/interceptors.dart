@@ -52,7 +52,17 @@ class LoggerInterceptor extends Interceptor {
     }
 
     final requestPath = '${options.baseUrl}${options.path}';
-    logger.i('${options.method} request ==> $requestPath');
+    String fullPath = requestPath;
+    if (options.queryParameters.isNotEmpty) {
+      final qp = options.queryParameters.entries
+          .map(
+            (e) =>
+                '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent('${e.value}')}',
+          )
+          .join('&');
+      fullPath = '$requestPath?$qp';
+    }
+    logger.i('${options.method} request ==> $fullPath');
     return super.onRequest(options, handler);
   }
 

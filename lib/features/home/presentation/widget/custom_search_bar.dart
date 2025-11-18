@@ -13,7 +13,7 @@ class SearchBarWidget extends StatelessWidget {
     this.controller,
     this.onChanged,
     this.onSubmitted,
-    this.hintText = 'Cari...',
+    this.hintText = 'Cari nama produk...',
   });
 
   @override

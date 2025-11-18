@@ -6,7 +6,8 @@ class GetListProductParams {
 
   Map<String, dynamic> toJson() {
     return {
-      'categoryId': categoryId,
+      // server expects snake_case key
+      'category_id': categoryId,
       'search': search,
     };
   }
