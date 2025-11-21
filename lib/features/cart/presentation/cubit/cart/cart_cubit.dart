@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 import 'package:gmedia_project/features/cart/domain/entity/cart_item_entity.dart';
-import 'package:gmedia_project/features/cart/presentation/cubit/cart_state.dart';
+import 'package:gmedia_project/features/cart/presentation/cubit/cart/cart_state.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
 import 'package:logger/logger.dart';
 

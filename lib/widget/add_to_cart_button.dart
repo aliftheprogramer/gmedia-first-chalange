@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gmedia_project/features/cart/presentation/cubit/cart_cubit.dart';
+import 'package:gmedia_project/features/cart/presentation/cubit/cart/cart_cubit.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
 

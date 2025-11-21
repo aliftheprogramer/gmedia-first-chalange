@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
-import 'package:gmedia_project/features/cart/presentation/cubit/cart_cubit.dart';
+import 'package:gmedia_project/features/cart/presentation/cubit/cart/cart_cubit.dart';
 import 'package:gmedia_project/features/home/presentation/pages/home_screen.dart';
 import 'package:gmedia_project/features/cart/presentation/pages/cart_page.dart';
 // Removed full-page AddProductScreen usage; using bottom sheet variant instead.

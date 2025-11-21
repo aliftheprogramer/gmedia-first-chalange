@@ -14,7 +14,7 @@ import 'package:gmedia_project/features/category/domain/usecase/get_all_category
 import 'package:gmedia_project/features/category/presentation/cubit/category_state.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/product_sell/product_sell_cubit.dart';
 import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
-import 'package:gmedia_project/features/cart/presentation/cubit/cart_cubit.dart';
+import 'package:gmedia_project/features/cart/presentation/cubit/cart/cart_cubit.dart';
 
 class GetAllProductsScreen extends StatefulWidget {
   const GetAllProductsScreen({super.key});

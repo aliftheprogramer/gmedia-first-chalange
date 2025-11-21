@@ -37,7 +37,7 @@ import 'package:gmedia_project/navigation/cubit/navigation_cubit.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gmedia_project/features/product/presentation/cubit/add_product_cubit.dart';
-import 'package:gmedia_project/features/cart/presentation/cubit/cart_cubit.dart';
+import 'package:gmedia_project/features/cart/presentation/cubit/cart/cart_cubit.dart';
 
 final sl = GetIt.instance;
 
