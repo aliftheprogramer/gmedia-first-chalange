@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
+import 'package:gmedia_project/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/product_sell/product_sell_cubit.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/product_sell/product_sell_state.dart';
 import 'package:gmedia_project/features/home/presentation/pages/get_all_products_screen.dart';
@@ -100,12 +101,12 @@ class ProductSellWidget extends StatelessWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: 12,
-                                  crossAxisSpacing: 12,
-                                  // make items taller by reducing the aspect ratio
-                                  childAspectRatio: 0.62,
-                                ),
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            // make items taller by reducing the aspect ratio
+                            childAspectRatio: 0.62,
+                          ),
                       itemCount: products.length,
                       itemBuilder: (context, index) {
                         final p = products[index];
@@ -223,6 +224,7 @@ class ProductSellItem extends StatelessWidget {
             width: double.infinity,
             child: CustomButtonCart(
               onPressed: () {
+                context.read<CartCubit>().addProduct(product);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(

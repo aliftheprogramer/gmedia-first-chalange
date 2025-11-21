@@ -30,6 +30,9 @@ class HomeScreen extends StatelessWidget {
             onProfileTap: () {
               context.read<NavigationCubit>().updateIndex(2);
             },
+            onCartTap: () {
+              context.read<NavigationCubit>().updateIndex(1);
+            },
           ),
           backgroundColor: Color(0xFFEBF0FD),
           body: ListView(

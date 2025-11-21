@@ -1,23 +1,32 @@
 // lib/features/cart/presentation/widget/item_cart_widget.dart
 
 import 'package:flutter/material.dart';
+import 'package:gmedia_project/features/cart/domain/entity/cart_item_entity.dart';
+import 'package:intl/intl.dart';
 
 class ItemCartWidget extends StatelessWidget {
-  final String title;
-  final String price;
-  final String imageUrl;
-  final int quantity;
+  final CartItemEntity cartItem;
+  final VoidCallback onDelete;
+  final Function(int) onQuantityChanged;
 
   const ItemCartWidget({
     super.key,
-    required this.title,
-    required this.price,
-    required this.imageUrl,
-    required this.quantity,
+    required this.cartItem,
+    required this.onDelete,
+    required this.onQuantityChanged,
   });
 
   @override
   Widget build(BuildContext context) {
+    final formattedPrice = NumberFormat(
+      '#,###',
+      'id_ID',
+    ).format(cartItem.product.price);
+    final formattedTotalPrice = NumberFormat(
+      '#,###',
+      'id_ID',
+    ).format(cartItem.totalPrice);
+
     return Container(
       // HAPUS: color: Colors.white,  <-- Agar transparan dan mengikuti warna parent
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -28,7 +37,7 @@ class ItemCartWidget extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.network(
-              imageUrl,
+              cartItem.product.pictureUrl,
               width: 80,
               height: 80,
               fit: BoxFit.cover,
@@ -48,7 +57,7 @@ class ItemCartWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  cartItem.product.name,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -56,12 +65,12 @@ class ItemCartWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  price,
+                  'Rp.$formattedPrice',
                   style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  price,
+                  'Rp.$formattedTotalPrice',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -77,7 +86,7 @@ class ItemCartWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               InkWell(
-                onTap: () {},
+                onTap: onDelete,
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
@@ -101,7 +110,11 @@ class ItemCartWidget extends StatelessWidget {
                 child: Row(
                   children: [
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        if (cartItem.quantity > 1) {
+                          onQuantityChanged(cartItem.quantity - 1);
+                        }
+                      },
                       child: const Icon(
                         Icons.remove,
                         size: 16,
@@ -110,12 +123,14 @@ class ItemCartWidget extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      '$quantity',
+                      '${cartItem.quantity}',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 12),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        onQuantityChanged(cartItem.quantity + 1);
+                      },
                       child: const Icon(
                         Icons.add,
                         size: 16,
