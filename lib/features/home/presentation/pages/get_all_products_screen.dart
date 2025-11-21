@@ -14,6 +14,7 @@ import 'package:gmedia_project/features/category/domain/usecase/get_all_category
 import 'package:gmedia_project/features/category/presentation/cubit/category_state.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/product_sell/product_sell_cubit.dart';
 import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
+import 'package:gmedia_project/features/cart/presentation/cubit/cart_cubit.dart';
 
 class GetAllProductsScreen extends StatefulWidget {
   const GetAllProductsScreen({super.key});
@@ -51,11 +52,23 @@ class _GetAllProductsScreenState extends State<GetAllProductsScreen> {
                 return cubit;
               },
             ),
+            // Provide CartCubit here so ProductSellItem can access it when navigated via this standalone screen
+            BlocProvider<CartCubit>(create: (_) => sl<CartCubit>()),
           ],
           child: Scaffold(
             extendBody: true,
             backgroundColor: Colors.white,
-            appBar: const HomeAppBar(),
+            appBar: HomeAppBar(
+              onCartTap: () {
+                // Navigate to cart via NavigationCubit index then return to root if needed
+                context.read<NavigationCubit>().updateIndex(1);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              onProfileTap: () {
+                context.read<NavigationCubit>().updateIndex(2);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            ),
             bottomNavigationBar: CustomBottomNavigator(
               currentIndex: navIndex,
               onTap: (index) {

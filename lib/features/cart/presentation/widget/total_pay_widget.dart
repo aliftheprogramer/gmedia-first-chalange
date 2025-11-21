@@ -4,8 +4,13 @@ import 'package:flutter/material.dart';
 
 class TotalPayWidget extends StatelessWidget {
   final String totalPrice;
+  final int totalItems;
 
-  const TotalPayWidget({super.key, required this.totalPrice});
+  const TotalPayWidget({
+    super.key,
+    required this.totalPrice,
+    required this.totalItems,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +55,9 @@ class TotalPayWidget extends StatelessWidget {
                           minWidth: 16,
                           minHeight: 16,
                         ),
-                        child: const Text(
-                          '6',
-                          style: TextStyle(
+                        child: Text(
+                          '$totalItems',
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 8,
                             fontWeight: FontWeight.bold,

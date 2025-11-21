@@ -2,13 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gmedia_project/core/services/services_locator.dart';
-import 'package:gmedia_project/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/product_sell/product_sell_cubit.dart';
 import 'package:gmedia_project/features/home/presentation/cubit/product_sell/product_sell_state.dart';
 import 'package:gmedia_project/features/home/presentation/pages/get_all_products_screen.dart';
 import 'package:gmedia_project/features/product/domain/entity/product_entity_response.dart';
 import 'package:gmedia_project/features/product/domain/usecase/get_list_product_usecase.dart';
-import 'package:gmedia_project/widget/custom_button_cart.dart';
+import 'package:gmedia_project/widget/add_to_cart_button.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
@@ -222,20 +221,7 @@ class ProductSellItem extends StatelessWidget {
           SizedBox(
             height: 40,
             width: double.infinity,
-            child: CustomButtonCart(
-              onPressed: () {
-                context.read<CartCubit>().addProduct(product);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      '${product.name} telah ditambahkan ke keranjang',
-                    ),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              },
-              width: double.infinity,
-            ),
+            child: AddToCartButton(product: product),
           ),
         ],
       ),
